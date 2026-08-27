@@ -1,99 +1,89 @@
-# sempods.org Website
+# sempods website
 
-## Project Overview
+The site at [www.sempods.org](https://www.sempods.org). Static, Astro, published to
+GitHub Pages.
 
-Landing page + AI chat for sempods.org. First iteration: **chat-only UI** —
-no rendered content pages yet, just the conversational interface.
+**This file described a Next.js chat app until 2026-08-27.** That iteration is over —
+the chat is deferred, not deleted, and lives in this repository's history. If you are
+looking for the streaming chat UI, the API route or `ANTHROPIC_API_KEY`, none of them
+are part of the current site by decision.
 
-## Tech Stack
+## Stack
 
-- **Framework:** Next.js (App Router)
-- **AI Chat:** Vercel AI SDK with streaming
-- **LLM Provider:** Anthropic (Claude) — API key via environment variable
-- **Styling:** TBD (keep it clean, minimal, not generic-AI-looking)
-- **Deployment:** Netlify
+- **Astro**, static output, no runtime
+- **Pagefind** for search, run over `dist/` as part of `npm run build`
+- **GitHub Pages**, deployed by `.github/workflows/deploy.yml` on push to `main`
+- No webfonts, no client JavaScript beyond the search widget
 
-## Architecture: Content-as-Source
+Why Pages and not Netlify: Netlify manages an apex and its `www` as a pair and cannot
+serve `www.sempods.org` without also claiming `sempods.org`. That host is the pod
+server, so the certificate request never completes and the domain configuration stays
+locked. `public/CNAME` is the whole setup here.
 
-The chat is powered by markdown files in `content/`. These files are the
-**single source of truth** — they will later also be rendered as web pages.
+Why not `sempods.org` itself: every first path segment there is a pod name. A
+multi-page site would permanently remove `/about`, `/start` and every other top-level
+path from the pod namespace, and those identifiers are promised not to change.
 
-### How the chat works
+## Content
 
-Three layers of context, loaded progressively:
+**The prose here is independent of the repositories.** `docs/` in `sempods-kotlin` is
+written for implementers; rewriting it to suit a website would make it worse as a
+specification. Link to it, do not absorb it.
 
-1. **Always loaded** (~4-5k tokens):
-   - `content/system-prompt.md` — personality, tone, behavioral rules
-   - `content/sempods-core.md` — condensed knowledge base (enough for most questions)
-   - `content/index.md` — directory of all content files with descriptions
+**Code examples are the exception, and it is not stylistic.** `0.x` may break the
+public API, so a snippet that no longer compiles is worse than none — it is the first
+thing a visitor tries, and the impression is not "stale docs" but "does not work".
+Examples come from a compiled source in the reference implementation. **Never type a
+new code example straight into a page.** If you need one that does not exist yet, say
+so rather than inventing it.
 
-2. **Loaded on demand** (per question, 1-3 files):
-   - The LLM reads `index.md` and decides which files are relevant
-   - Uses tool use / function calling to load specific content files
-   - Example: visitor asks about Solid → LLM loads `tech/solid-comparison.md`
+The same rule applies to live queries: if a page claims the response contains
+something, run the query and check that it does. A `SELECT` that omits the variable
+the surrounding paragraph talks about is exactly the kind of error a reader finds in
+ten seconds.
 
-3. **Creative extrapolation** (no file needed):
-   - For domains without a pre-written use case, the LLM derives scenarios
-   - from the principles in `sempods-core.md`
-   - The system prompt explicitly coaches this behavior
+`_legacy-content/` is the previous chatbot knowledge base. Raw material, not copy — it
+was written for a model to answer from, not for a human to read, and parts of it are
+out of date. Mine it, do not paste it.
 
-### Content file format
+## Tone
 
-```markdown
----
-name: Human-readable title
-description: One-line description (used by the LLM to judge relevance)
-type: use-case | business-case | tech | background | system | core | index
----
+`_legacy-content/system-prompt.md` remains the best statement of voice the project
+has, and the site inherits it: conviction earned by argument rather than enthusiasm,
+openly unfinished as a strength rather than something to hide, skeptics welcome, never
+salesy. "Here is what it does, and here is what it does not do yet."
 
-# Content here (markdown)
-```
+**sempods** is always lowercase, even at the start of a sentence. It is "a pod", never
+"a sempod". w2d2d stands for "What to do today?" and is explained on first mention.
 
-### Adding new content
+Two rules in that prompt are chatbot rules and do **not** apply here:
 
-1. Create a `.md` file in the appropriate `content/` subdirectory
-2. Add a one-line entry to `content/index.md`
-3. Done — the chat automatically discovers and uses it
+- *Third person.* It stops an assistant from impersonating the founder. A website
+  speaks for the project, and the origin page is specifically where first person
+  belongs.
+- *"No single core, six innovations together."* Right for a chat that must not be
+  talked out of its position; fatal for a website, where six equal concepts are no
+  concept. The site explains exactly one — **contexts** — and hangs the rest off it.
 
-## First Iteration Scope
+## Structure
 
-- [ ] Next.js project setup
-- [ ] Chat UI component (full-screen, centered, streaming responses)
-- [ ] API route that sends system-prompt + core + index as context
-- [ ] Tool/function for loading additional content files on demand
-- [ ] Rate limiting per IP (prevent API cost abuse)
-- [ ] Minimal landing: hero text + chat — nothing else needed yet
-- [ ] Environment: `ANTHROPIC_API_KEY`
+Show what is visible, explain what is not. A curl can demonstrate semantic structure,
+linked data and decentralisation — it cannot show permissions, which is why contexts
+is the one explained concept.
 
-## Design Direction
+The home page leads with a working, unauthenticated query against a live pod. That
+placement is deliberate and should survive edits: it proves the claim in ten seconds
+where a paragraph only asserts it.
 
-- Clean, minimal, confident — not a typical chatbot widget
-- The chat IS the website (first iteration)
-- Hero text above the chat: "Your data should belong to you."
-- Subtext: "Ask me anything about sempods."
-- Dark/light mode: follow system preference
-- Mobile-friendly
+## Language
 
-## What NOT to build yet
+English only. Ten pages become twenty otherwise, and with one maintainer the second
+set goes stale. URLs carry **no language prefix** (`/use-cases/events`, never
+`/en/use-cases/events`) so Astro's `prefixDefaultLocale: false` can add `/de/` later
+without moving an existing URL.
 
-- Content page rendering (Phase 2)
-- User accounts or sessions
-- Chat history persistence
-- Multiple chat threads
-- Analytics
+## Decisions
 
-## Content Sync
-
-The `content/` directory is maintained in the eventer-backend repo
-(`sempods/website/content/`). For now, copy it into this repo. Later,
-automate via build script or submodule.
-
-## Key Context for the AI Chat
-
-The chatbot should feel like talking to someone who deeply understands
-and believes in the project — but is also honest about risks and limitations.
-Read `content/system-prompt.md` carefully; it defines the personality.
-
-The project creator is Danilo Stein, based in Chemnitz, Germany. The project
-is bilingual (German + English), and the chat should respond in the visitor's
-language.
+Structure, what is settled and what is still open: `docs/roadmaps/website.md` in the
+private planning repo. Read it before proposing a change to the information
+architecture — most of it has already been argued through once.

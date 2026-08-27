@@ -14,7 +14,7 @@ const curl = `curl -X POST https://sempods.org/aaltra/_system/sparql/query \\
   -H "Content-Type: application/sparql-query" \\
   -H "Accept: application/sparql-results+json" \\
   --data 'PREFIX schema: <https://schema.org/>
-SELECT ?name ?start WHERE {
+SELECT ?e ?name ?start WHERE {
   ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
 } ORDER BY ?start LIMIT 3'`;
 ---
@@ -71,9 +71,11 @@ SELECT ?name ?start WHERE {
   <div class="proof">
     <h3>It is linked</h3>
     <p>
-      Each event in that response carries a URI. Request it and you get the
-      resource — the venue, the address, whatever else was published. Following a
-      link is the same operation as the first request.
+      That is what <code>?e</code> is doing in the query: every row comes back with
+      the event's own URI, something like
+      <code>sempods.org/aaltra/events/daokmoft62r6ks3rmalu0hdaao</code>. Request it
+      and you get the resource — the venue, the address, whatever else was
+      published. Following a link is the same operation as the first request.
     </p>
     <p class="evidence">
       This is Linked Open Data as specified, not an export format. The data is on

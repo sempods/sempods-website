@@ -3,5 +3,10 @@ dist/
 node_modules/
 .DS_Store
 *.log
+
+# Every local env file, not just the two names this project happens to use.
+# An existing checkout may still hold .env.local with the old chat's API key,
+# and `git add .` should never be the thing standing between it and a push.
 .env
-.env.production
+.env.*
+!.env.example
