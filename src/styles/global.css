@@ -17,7 +17,7 @@
 
   --ink: #1a1c1a;
   --ink-soft: #5b615d;
-  --ink-faint: #8b918d;
+  --ink-faint: #6a706b; /* 4.86:1 on --paper; #8b918d was 3.08:1 */
   --paper: #fbfaf8;
   --paper-raised: #ffffff;
   --rule: #e4e2dd;
@@ -32,7 +32,7 @@
   :root {
     --ink: #e8e6e1;
     --ink-soft: #a3a8a4;
-    --ink-faint: #767b78;
+    --ink-faint: #8f948f; /* 5.89:1 on --paper; #767b78 was 4.22:1 */
     --paper: #141615;
     --paper-raised: #1c1f1d;
     --rule: #2b2f2d;
@@ -194,4 +194,31 @@ main { padding-top: 3.5rem; }
   body { font-size: 1.1rem; }
   h1 { font-size: 2.05rem; }
   main { padding-top: 2.5rem; }
+}
+
+/* ---- search ------------------------------------------------------------ */
+
+/*
+ * Pagefind's default UI, retuned to the page. Its own stylesheet ships a look
+ * that belongs to a documentation site; only the tokens below are overridden so
+ * the widget reads as part of the text rather than a component dropped into it.
+ */
+#search {
+  --pagefind-ui-scale: 0.8;
+  --pagefind-ui-primary: var(--ink);
+  --pagefind-ui-text: var(--ink);
+  --pagefind-ui-background: var(--paper);
+  --pagefind-ui-border: var(--rule);
+  --pagefind-ui-tag: var(--accent-soft);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 6px;
+  --pagefind-ui-font: var(--sans);
+  margin: 2rem 0 4rem;
+}
+#search .pagefind-ui__result-title a { font-family: var(--sans); }
+
+.search-note {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
 }

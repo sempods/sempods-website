@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Search — sempods" description="Search everything on this site.">
+  <h1>Search</h1>
+  <p class="search-note">
+    The index is built from the rendered pages, so it cannot fall behind them.
+    Nothing is sent anywhere — the search runs in your browser.
+  </p>
+
+  <div id="search"></div>
+
+  <noscript>
+    <p>
+      Search needs JavaScript. Everything is reachable from the
+      <a href="/">home page</a> without it.
+    </p>
+  </noscript>
+</Base>
+
+<!--
+  Pagefind's assets only exist after a build (`npm run build` runs it over dist/),
+  so in `astro dev` this widget is absent rather than broken. The guard keeps the
+  dev console quiet instead of throwing on a missing global.
+-->
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof PagefindUI === 'undefined') {
+      document.getElementById('search').innerHTML =
+        '<p class="search-note">Search is available on the built site, not in dev.</p>';
+      return;
+    }
+    new PagefindUI({ element: '#search', showSubResults: true, showImages: false });
+  });
+</script>

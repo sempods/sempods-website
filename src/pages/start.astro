@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { gradleDependencies, SEMPODS_VERSION } from '../data/coordinates';
 
 // DRAFT. The ladder itself is settled — see docs/roadmaps/website.md. Only the
 // last rung is honestly "coming soon"; the first one works right now.
@@ -12,8 +13,6 @@ SELECT ?e ?name ?start WHERE {
   ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
 } ORDER BY ?start LIMIT 3'`;
 
-const deps = `implementation(platform("org.sempods:sempods-bom:0.1.0"))
-implementation("org.sempods:sempods-client")`;
 ---
 
 <Base
@@ -62,10 +61,11 @@ implementation("org.sempods:sempods-client")`;
     The artifacts are on Maven Central, so the starting point is two lines:
   </p>
 
-  <pre><code>{deps}</code></pre>
+  <pre><code>{gradleDependencies}</code></pre>
 
   <p>
-    Java 21 bytecode, so nothing forces you onto a newer toolchain.
+    Version {SEMPODS_VERSION}, Java 21 bytecode — nothing forces you onto a newer
+    toolchain.
     <code>SempodsPodClient</code> covers reading, writing, contexts and SPARQL;
     the token exchange is one call.
   </p>
