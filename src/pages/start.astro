@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+
+// DRAFT. The ladder itself is settled — see docs/roadmaps/website.md. Only the
+// last rung is honestly "coming soon"; the first one works right now.
+
+const readQuery = `curl -X POST https://sempods.org/aaltra/_system/sparql/query \\
+  -H "Content-Type: application/sparql-query" \\
+  -H "Accept: application/sparql-results+json" \\
+  --data 'PREFIX schema: <https://schema.org/>
+SELECT ?name ?start WHERE {
+  ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
+} ORDER BY ?start LIMIT 3'`;
+
+const deps = `implementation(platform("org.sempods:sempods-bom:0.1.0"))
+implementation("org.sempods:sempods-client")`;
+---
+
+<Base
+  title="Start — sempods"
+  description="Four ways into sempods, from a single curl against a live pod to building against the published artifacts."
+  schemaType="TechArticle"
+>
+  <h1>Start</h1>
+
+  <p class="lede">
+    Four rungs, in order of effort. The first one needs nothing installed and is
+    the fastest way to find out whether this is interesting.
+  </p>
+
+  <h2>1. Read a live pod</h2>
+
+  <p>
+    Public contexts are readable without authentication. This is a real venue's
+    calendar, served from its own pod:
+  </p>
+
+  <pre><code>{readQuery}</code></pre>
+
+  <p>
+    Change <code>aaltra</code> to another pod name and the same request works.
+    That is the whole discovery mechanism — there is no registry to consult.
+  </p>
+
+  <h2>2. Run your own pod</h2>
+
+  <p>
+    <code>deployments/local/compose.yaml</code> in the reference implementation
+    brings up a pod, an identity service and the stores behind them. It is one
+    command, and it gives you something to write to rather than only read from.
+  </p>
+
+  <p>
+    Being honest about this rung: once it is running, the interesting part —
+    putting your own data in and getting it back out through an app — is the next
+    rung, not this one.
+  </p>
+
+  <h2>3. Build against it</h2>
+
+  <p>
+    The artifacts are on Maven Central, so the starting point is two lines:
+  </p>
+
+  <pre><code>{deps}</code></pre>
+
+  <p>
+    Java 21 bytecode, so nothing forces you onto a newer toolchain.
+    <code>SempodsPodClient</code> covers reading, writing, contexts and SPARQL;
+    the token exchange is one call.
+  </p>
+
+  <h2>4. Use the apps — not yet</h2>
+
+  <p>
+    The applications built on sempods — a task manager, a chat client, an explorer
+    — are not open source yet. When they are, this rung becomes the shortest one:
+    point an app at a pod and use it. Until then it is honest to say it is not
+    available rather than to describe it.
+  </p>
+
+  <hr class="divider" />
+
+  <p>
+    Stuck, or something did not behave as written? That is worth an
+    <a href="https://github.com/sempods/sempods-kotlin/issues">issue</a> — a
+    first-run problem is the most valuable bug report a project this young can get.
+  </p>
+</Base>

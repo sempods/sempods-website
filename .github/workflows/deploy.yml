@@ -1,0 +1,51 @@
+# Build the site and publish it to GitHub Pages.
+#
+# Pages rather than Netlify for one concrete reason: Netlify manages an apex and
+# its `www` as a pair, and cannot serve www.sempods.org without also claiming
+# sempods.org — which points at the pod server, so the certificate request never
+# completes. Pages has no such coupling. public/CNAME carries the domain.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a queued run supersedes an older one but never cancels a
+# deploy that is already writing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # `build` runs astro and then pagefind over dist/ — the search index is
+      # built from the rendered output, so it cannot drift from the pages.
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

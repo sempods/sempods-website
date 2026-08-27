@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** schema.org type for this page's JSON-LD. */
+  schemaType?: 'WebSite' | 'TechArticle' | 'WebPage';
+  /** Wide measure for pages that carry tables or long code. */
+  wide?: boolean;
+}
+
+const { title, description, schemaType = 'WebPage', wide = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const measure = wide ? 'measure-wide' : 'measure';
+
+/*
+ * Structured data on every page, and it is not an SEO trick here: a project that
+ * argues for machine-readable knowledge and ships a page whose own markup says
+ * nothing would be refuted by its own source. These are the same fields the
+ * frontmatter carries, which is what makes the site the first vault rather than
+ * a page about one.
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': schemaType,
+  name: title,
+  description,
+  url: canonical.href,
+  inLanguage: 'en',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'sempods',
+    url: 'https://www.sempods.org',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'sempods',
+    url: 'https://www.sempods.org',
+    email: 'hello@sempods.org',
+  },
+};
+
+const nav = [
+  { href: '/how-it-works', label: 'How it works' },
+  { href: '/use-cases', label: 'Use cases' },
+  { href: '/start', label: 'Start' },
+  { href: '/roadmap', label: 'Roadmap' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:site_name" content="sempods" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+
+  <body>
+    <header class="site-head">
+      <div class="measure-wide row">
+        <a class="wordmark" href="/">sempods</a>
+        <nav class="site-nav">
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
+      </div>
+    </header>
+
+    <!-- Pagefind indexes the article, not the chrome: without this the nav and
+         footer land in every result's excerpt. -->
+    <main data-pagefind-body>
+      <div class={measure}>
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-foot">
+      <div class="measure-wide">
+        <p>
+          sempods is a specification with a reference implementation. Code under
+          Apache&nbsp;2.0, documentation under CC&nbsp;BY&nbsp;4.0.
+        </p>
+        <p>
+          <a href="https://github.com/sempods/sempods-kotlin">GitHub</a> ·
+          <a href="https://github.com/sempods/sempods-kotlin/discussions">Discussions</a> ·
+          <a href="mailto:hello@sempods.org">hello@sempods.org</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
