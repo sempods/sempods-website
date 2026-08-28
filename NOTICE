@@ -1,0 +1,9 @@
+sempods website
+
+The sempods mark and favicon are based on the Material Icons "Webhook" icon by
+Google, licensed under the Apache License, Version 2.0.
+
+Source: https://github.com/google/material-design-icons
+
+The SVG wrapper files copied from sempods-spec modify the exported SVG
+structure, accessible labels, colour handling, padding and app-icon background.
