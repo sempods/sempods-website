@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="MCP over sempods — agents as clients of decentralized pods"
+  description="How sempods exposes pod data through MCP without giving AI a privileged backdoor, and why multi-pod MCP matters for decentralized graph retrieval."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">concepts · MCP</p>
+  <h1>MCP should make pods reachable, not centralize memory</h1>
+
+  <p class="lede">
+    MCP is interesting for sempods because agents need a simple way to ask for
+    data. It is also dangerous if it becomes a second, more privileged path
+    around the system.
+  </p>
+
+  <p>
+    The reference implementation takes the conservative route: the pod MCP
+    endpoint sits at <code>/_system/mcp</code> and exposes tools over the same
+    pod model. The agent is a client. It receives what its token and grants
+    allow.
+  </p>
+
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="MCP tools use the same pod authorization model as HTTP and SPARQL">{`web app        agent via MCP        website
+   |                |                  |
+   v                v                  v
+HTTP/CRUD        MCP tools          SPARQL
+   \\               |                 /
+    \\              |                /
+     v             v               v
+       same pod authorization`}</pre>
+
+  <h2>The useful tools are boring on purpose</h2>
+
+  <p>
+    The useful MCP surface is not magic. It exposes primitives an agent can
+    combine: list contexts, <code>find</code> a foothold, fetch a resource, read
+    property values, or run sandboxed SPARQL.
+  </p>
+
+  <p>
+    That is enough to support graph retrieval. The agent does not need a custom
+    "answer my whole product question" endpoint. It needs safe access to the
+    graph and enough structure to inspect what it found.
+  </p>
+
+  <h2>Multi-pod MCP</h2>
+
+  <p>
+    Multi-pod MCP is where the model becomes more than an assistant integration.
+    A single client can connect to several pods, call <code>find</code> across
+    them, and merge the results into a working graph.
+  </p>
+
+  <p>
+    Each pod still decides its own visibility. One pod can fail, require
+    reconnect, or return only public data without poisoning the whole result.
+    That is a better shape for federation than copying all memories into one
+    assistant-owned store.
+  </p>
+
+  <div class="proof">
+    <h3>Agent memory without agent ownership</h3>
+    <p>
+      A hosted MCP service can make several pod connections convenient, but the
+      architectural goal is still the same: the source of truth remains in pods,
+      not in the agent host.
+    </p>
+    <p class="evidence">
+      The revolution is quieter when it is phrased as a rule: agents come to the
+      data.
+    </p>
+  </div>
+
+  <h2>What is still early</h2>
+
+  <p>
+    The rough edges are in tool ergonomics, hosted connection UX, richer
+    retrieval adapters and future write constraints. The baseline is already
+    useful because it keeps the MCP surface close to the same HTTP, SPARQL and
+    permission model the pod already uses.
+  </p>
+
+  <p class="action-links">
+    <a href="/concepts">Back to concepts</a>
+    <a href="/concepts/linked-data-crud">Next: Linked Data CRUD</a>
+    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/mcp/tools.md">Implementation notes</a>
+  </p>
+</Base>

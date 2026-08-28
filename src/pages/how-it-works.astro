@@ -1,15 +1,144 @@
 ---
 import Base from '../layouts/Base.astro';
-
-// SKELETON — structure decided, copy not written. See docs/roadmaps/website.md.
 ---
 
-<Base title="How it works — sempods" description="Contexts: the single authorisation primitive, and why there is no second policy language." schemaType="TechArticle">
-  <h1>Contexts</h1>
-  <p class="lede">Contexts: the single authorisation primitive, and why there is no second policy language.</p>
+<Base
+  title="How sempods works — contexts, RDF and permissions"
+  description="How sempods uses URIs, RDF, JSON-LD, contexts and server-enforced permissions to create decentralized semantic data pods."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">the model</p>
+  <h1>One graph, many clients, one permission model</h1>
+
+  <p class="lede">
+    sempods is easier to understand if you do not start with apps. Start with
+    the data: every thing has an address, every statement has meaning, and every
+    statement belongs to a context.
+  </p>
+
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="HTTP, SPARQL and MCP use the same context permissions and RDF graph">{`HTTP resources     SPARQL queries      MCP tools
+      \\                 |                /
+       \\                |               /
+        v               v              v
+
+          same context permissions
+                    |
+                    v
+              one RDF graph`}</pre>
+
+  <h2>1. Resources are web addresses</h2>
+
   <p>
-    This page is not written yet. The <a href="/">home page</a> carries the short
-    version, and the <a href="https://github.com/sempods/sempods-kotlin">reference
-    implementation</a> carries the long one.
+    A pod resource is identified by a URI. That URI is not just an internal ID;
+    it is an address. Request it over HTTP and the pod can return a machine-readable
+    description of the resource, typically JSON-LD.
+  </p>
+
+  <p>
+    This is what makes the model feel web-native rather than platform-native.
+    Links can cross apps, pods and organizations without asking a central service
+    to translate every identifier.
+  </p>
+
+  <h2>2. Data is RDF, not a private app shape</h2>
+
+  <p>
+    sempods stores knowledge as RDF statements. A task, event, place or person is
+    not reduced to a JSON object invented by one product. It can use shared
+    vocabulary such as schema.org and later more specific models.
+  </p>
+
+  <p>
+    That does not mean every app developer has to think in triples all day. It
+    means the underlying contract stays semantic, so apps and AI agents can meet
+    on common meaning instead of one-off integrations.
+  </p>
+
+  <h2>3. Contexts are the permission boundary</h2>
+
+  <p>
+    RDF has a fourth dimension: the named graph, or context. sempods makes that
+    context the core authorization primitive. Every statement belongs to exactly
+    one context. Access is granted as <code>read</code>, <code>write</code> or
+    <code>manage</code> on contexts.
+  </p>
+
+  <div class="proof">
+    <h3>Same resource, different depth</h3>
+    <p>
+      An event can have public statements in one context and private statements
+      in another. Anonymous visitors see the public date and title. The venue's
+      own app can also see drafts, notes or internal planning data.
+    </p>
+    <p class="evidence">
+      There is one event URI, not one public copy and one private copy.
+    </p>
+  </div>
+
+  <h2>4. SPARQL is sandboxed by the server</h2>
+
+  <p>
+    The SPARQL endpoint is powerful because it queries the graph directly. That
+    only works safely if the server, not the client, decides which contexts are
+    visible.
+  </p>
+
+  <p>
+    A query can ask broad questions, but the result is limited to contexts the
+    caller may read. The same rule applies to write operations. An app or agent
+    cannot escape by naming a private graph in the query.
+  </p>
+
+  <h2>5. HTTP, SPARQL and MCP use the same path</h2>
+
+  <p>
+    A browser, a web app and an AI agent can enter through different doors. HTTP
+    resource requests, SPARQL queries and MCP tools are different interfaces over
+    the same pod model.
+  </p>
+
+  <p>
+    That matters because MCP does not become a privileged backdoor for AI. An
+    agent is just a client. It sees the contexts its token allows, and nothing
+    more.
+  </p>
+
+  <p>
+    In the reference implementation, a pod exposes that client path at
+    <code>/_system/mcp</code>. The aaltra pod has one too, which makes the live
+    event example testable through more than HTTP and SPARQL.
+  </p>
+
+  <h2>6. The control plane is protected</h2>
+
+  <p>
+    Pod data can describe permissions, apps and identities as knowledge. But the
+    authority to grant access lives in the protected <code>/_system</code> area,
+    not in arbitrary RDF statements written by an app.
+  </p>
+
+  <p>
+    That keeps a sharp line between data that says something and control-plane
+    state that actually authorizes something.
+  </p>
+
+  <h2>Where the model goes deeper</h2>
+
+  <p>
+    The next technical layer is graph retrieval: start with a semantic
+    <code>find</code>, inspect the returned graph, then follow URIs through
+    <code>get_resource</code> or SPARQL until the app or agent has the slice of
+    knowledge it needs.
+  </p>
+
+  <p>
+    SHACL shapes and a TBox model are still being explored as future semantic
+    contracts. They matter, but they are not the first published deep dive.
+  </p>
+
+  <p class="action-links">
+    <a href="/start">Try a live query</a>
+    <a href="/concepts/graph-retrieval">Read graph retrieval</a>
+    <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 </Base>

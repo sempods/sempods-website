@@ -2,9 +2,6 @@
 import Base from '../layouts/Base.astro';
 import { gradleDependencies, SEMPODS_VERSION } from '../data/coordinates';
 
-// DRAFT. The ladder itself is settled — see docs/roadmaps/website.md. Only the
-// last rung is honestly "coming soon"; the first one works right now.
-
 const readQuery = `curl -X POST https://sempods.org/aaltra/_system/sparql/query \\
   -H "Content-Type: application/sparql-query" \\
   -H "Accept: application/sparql-results+json" \\
@@ -12,78 +9,184 @@ const readQuery = `curl -X POST https://sempods.org/aaltra/_system/sparql/query 
 SELECT ?e ?name ?start WHERE {
   ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
 } ORDER BY ?start LIMIT 3'`;
-
 ---
 
 <Base
-  title="Start — sempods"
-  description="Four ways into sempods, from a single curl against a live pod to building against the published artifacts."
+  title="Start with sempods — query or run a pod"
+  description="Start with sempods by querying a live public pod, reading the Kotlin reference implementation, or building against the published JVM artifacts."
   schemaType="TechArticle"
 >
-  <h1>Start</h1>
+  <p class="eyebrow">try it yourself</p>
+  <h1>Start with the part that is real today</h1>
 
   <p class="lede">
-    Four rungs, in order of effort. The first one needs nothing installed and is
-    the fastest way to find out whether this is interesting.
+    sempods is still young, so the entry points are not equally polished. The
+    first one takes ten seconds. The deeper ones are for people who want to read
+    or run the reference implementation.
   </p>
 
-  <h2>1. Read a live pod</h2>
+  <section class="try-block">
+    <h2>1. Query a live public pod</h2>
+
+    <p>
+      Public contexts are readable without authentication. This query reads a
+      real venue's event calendar from its own pod:
+    </p>
+
+    <pre><code>{readQuery}</code></pre>
+
+    <p class="evidence">
+      The endpoint is ordinary HTTP. The query is ordinary SPARQL. The result is
+      JSON from live linked data, not a special website API.
+    </p>
+  </section>
+
+  <h2>2. Follow the data</h2>
 
   <p>
-    Public contexts are readable without authentication. This is a real venue's
-    calendar, served from its own pod:
+    The query returns event URIs. Open one and the pod returns the resource
+    itself with the statements you are allowed to see. That is the Linked Data
+    part: the identifier is also the address.
   </p>
 
-  <pre><code>{readQuery}</code></pre>
-
   <p>
-    Change <code>aaltra</code> to another pod name and the same request works.
-    That is the whole discovery mechanism — there is no registry to consult.
+    This is the smallest useful proof of decentralization. The venue owns the
+    event graph. Apps and websites can use it without becoming the place where
+    the data lives.
   </p>
 
-  <h2>2. Run your own pod</h2>
+  <h2>3. Ask for a hosted test pod</h2>
 
   <p>
-    <code>deployments/local/compose.yaml</code> in the reference implementation
-    brings up a pod, an identity service and the stores behind them. It is one
-    command, and it gives you something to write to rather than only read from.
+    <a href="https://sempods.org">sempods.org</a>{' '}is currently a private
+    multi-pod host. It already runs pods such as{' '}
+    <a href="https://sempods.org/aaltra">aaltra</a>{' '}and can be used for early
+    ideas or tests on request.
   </p>
 
   <p>
-    Being honest about this rung: once it is running, the interesting part —
-    putting your own data in and getting it back out through an app — is the next
-    rung, not this one.
+    That is the fastest path when you want a real pod without operating the
+    infrastructure yourself: backups, updates and migrations across version or
+    schema changes are handled on the hosted side. For a test pod, write to{' '}
+    <a href="mailto:danilo@sempods.org">danilo@sempods.org</a>.
   </p>
 
-  <h2>3. Build against it</h2>
+  <h2>4. Run your own pod</h2>
 
   <p>
-    The artifacts are on Maven Central, so the starting point is two lines:
+    The stronger decentralization proof is self-hosting. In
+    <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>, the
+    local deployment brings up a pod and the services behind it, so you can test
+    against infrastructure you run yourself.
+  </p>
+
+  <p>
+    This path is rougher than asking for a hosted test pod, but it matters. It
+    proves sempods is not one hosted service with a public API; the hosted path
+    is only the fastest way to begin.
+  </p>
+
+  <p class="action-links">
+    <a href="https://github.com/sempods/sempods-kotlin/tree/main/deployments/local">Open local deployment</a>
+  </p>
+
+  <h2>5. Read or run the reference implementation</h2>
+
+  <p>
+    <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is the
+    reference implementation. It contains the working server and client stack:
+    Linked Data CRUD, contexts, grants, SPARQL sandboxing and a pod MCP endpoint
+    at <code>/_system/mcp</code>.
+  </p>
+
+  <p>
+    The aaltra pod exposes that MCP path too, so the same live data can be tested
+    through HTTP, SPARQL or MCP without changing the ownership model.
+  </p>
+
+  <p>
+    It is not meant to be the only implementation. It is the executable proof
+    while the dedicated <code>sempods-spec</code> repository and OpenAPI contract
+    are being prepared.
+  </p>
+
+  <h2>6. Build against the JVM artifacts</h2>
+
+  <p>
+    The artifacts are on Maven Central. Until a compiled quickstart example is
+    pulled into the website, the coordinates live in one place here:
   </p>
 
   <pre><code>{gradleDependencies}</code></pre>
 
   <p>
-    Version {SEMPODS_VERSION}, Java 21 bytecode — nothing forces you onto a newer
-    toolchain.
-    <code>SempodsPodClient</code> covers reading, writing, contexts and SPARQL;
-    the token exchange is one call.
+    Version {SEMPODS_VERSION}, Java 21 bytecode. <code>SempodsPodClient</code>
+    covers reading, writing, contexts and SPARQL.
   </p>
 
-  <h2>4. Use the apps — not yet</h2>
+  <h2>7. Try the preview apps</h2>
 
   <p>
-    The applications built on sempods — a task manager, a chat client, an explorer
-    — are not open source yet. When they are, this rung becomes the shortest one:
-    point an app at a pod and use it. Until then it is honest to say it is not
-    available rather than to describe it.
+    <a href="https://apps.sempods.org">apps.sempods.org</a>{' '}is an early
+    collection of apps that connect to a pod by URL. Focus is a todo app,
+    Explorer visualizes the graph, and Konsum is a small shopping-list app.
+  </p>
+
+  <p>
+    The surface is still rough, but the architecture is the important part here:
+    these apps work against pods through the SDK that is being prepared for
+    public release.
+  </p>
+
+  <figure class="media-breakout">
+    <a
+      href="/images/explorer-aaltra.webp"
+      target="_blank"
+      rel="noopener"
+      aria-label="Open larger Explorer screenshot"
+    >
+      <img
+        src="/images/explorer-aaltra.webp"
+        width="1600"
+        height="1005"
+        loading="lazy"
+        decoding="async"
+        alt="Explorer app visualizing an aaltra event from a sempods pod as a graph"
+      />
+    </a>
+    <figcaption>
+      Explorer reads the aaltra pod as a graph: event, description, dates, image
+      data and schema.org terms stay connected. The image opens larger for
+      reading labels and edges.
+    </figcaption>
+  </figure>
+
+  <p class="action-links app-links">
+    <a href="https://apps.sempods.org/explorer/">Open Explorer</a>
+    <a href="https://apps.sempods.org/focus/">Open Focus</a>
+    <a href="https://apps.sempods.org">See preview apps</a>
+  </p>
+
+  <h2>8. Wait for the easier path</h2>
+
+  <p>
+    The public TypeScript SDK is the next important surface for app builders.
+    Once it is open, this page should shift from "read the reference
+    implementation" toward "build a small app against a pod".
+  </p>
+
+  <p>
+    SHACL shapes and a TBox model may become part of that later: apps and agents
+    should eventually be able to discover the shapes and meaning they can work
+    with, not rely only on prose and convention.
   </p>
 
   <hr class="divider" />
 
   <p>
-    Stuck, or something did not behave as written? That is worth an
-    <a href="https://github.com/sempods/sempods-kotlin/issues">issue</a> — a
-    first-run problem is the most valuable bug report a project this young can get.
+    Something does not behave as written?
+    <a href="https://github.com/sempods/sempods-kotlin/issues">Open an issue</a>.
+    A first-run problem is one of the most useful reports a project at this
+    stage can receive.
   </p>
 </Base>
