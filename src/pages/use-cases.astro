@@ -1,15 +1,108 @@
 ---
 import Base from '../layouts/Base.astro';
-
-// SKELETON — structure decided, copy not written. See docs/roadmaps/website.md.
 ---
 
-<Base title="Use cases — sempods" description="Three things sempods is used for today, one of which you can try in ten seconds." schemaType="TechArticle">
-  <h1>Use cases</h1>
-  <p class="lede">Three things sempods is used for today, one of which you can try in ten seconds.</p>
+<Base
+  title="sempods use cases — events, AI memory and open knowledge"
+  description="Use cases for sempods: Linked Open Data events, permission-aware AI memory, decentralized knowledge management and open knowledge publishing."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">what it enables</p>
+  <h1>Use cases that do not start with a silo</h1>
+
+  <p class="lede">
+    sempods is young, but the pattern is already visible: when data has its own
+    address, meaning and permission boundary, applications can cooperate without
+    one of them becoming the owner.
+  </p>
+
+  <section class="use-case">
+    <h2>Events as Linked Open Data</h2>
+    <p>
+      This is the most concrete example today. Venues manage events in an app,
+      but the public event data is served from their own pods as JSON-LD and can
+      be queried without an API key.
+    </p>
+    <p>
+      A venue website can read the same data. An aggregator can combine multiple
+      pods. An AI agent can answer what is happening this week. Nobody has to own
+      a central event database for the model to work.
+    </p>
+    <p class="evidence">
+      Try the aaltra pod on the{' '}<a href="/start">Start</a>{' '}page. It is live data
+      from a real venue in Chemnitz.
+    </p>
+  </section>
+
+  <section class="use-case">
+    <h2>AI memory under your control</h2>
+    <p>
+      Today, every assistant wants its own memory. That is convenient until you
+      switch tools, change providers, or ask what the assistant actually knows
+      about you.
+    </p>
+    <p>
+      With sempods, memory can be structured data in a pod. An AI agent receives
+      access like any other client: read these contexts, write to that context,
+      lose access when the token is revoked.
+    </p>
+    <p>
+      The important part is not that AI is special. It is that AI is finally a
+      client powerful enough to use a personal knowledge graph well.
+    </p>
+  </section>
+
+  <section class="use-case">
+    <h2>Knowledge management for products and teams</h2>
+    <p>
+      Many companies are trying to make AI answer from internal knowledge without
+      copying everything into yet another proprietary system. The hard part is
+      not only retrieval. It is structure, permission and provenance.
+    </p>
+    <p>
+      sempods fits that shape: knowledge can stay distributed, permissions remain
+      explicit, and apps or agents can query the graph they are allowed to see.
+      Early product conversations are happening in this direction, though none
+      are public announcements yet.
+    </p>
+    <p class="evidence">
+      This is where adoption by independent players could matter most: the
+      personal data vision becomes stronger when organizations use the same open
+      model for practical reasons.
+    </p>
+  </section>
+
+  <section class="use-case">
+    <h2>Open knowledge publishing</h2>
+    <p>
+      Museums, cities, research groups and communities often have knowledge that
+      should be linkable and reusable, but not locked into one website or export
+      format.
+    </p>
+    <p>
+      A pod can publish public contexts as Linked Open Data and keep other
+      contexts private or paid. The public layer gives the web something to link
+      to. The private layer keeps curation, workflow and access control with the
+      publisher.
+    </p>
+  </section>
+
+  <hr class="divider" />
+
+  <h2>What is still missing</h2>
+
   <p>
-    This page is not written yet. The <a href="/">home page</a> carries the short
-    version, and the <a href="https://github.com/sempods/sempods-kotlin">reference
-    implementation</a> carries the long one.
+    The foundation exists, but the easy paths are still being built. The public
+    TypeScript SDK, the dedicated specification repository and better
+    <code>find</code> adapters are the next pieces that make these use cases
+    easier to implement outside the reference stack. SHACL shapes and a TBox
+    model remain important design work, but they are not final public contracts
+    yet.
+  </p>
+
+  <p class="action-links">
+    <a href="/how-it-works">Understand the model</a>
+    <a href="/concepts">Read concepts</a>
+    <a href="/start">Start with sempods</a>
   </p>
 </Base>

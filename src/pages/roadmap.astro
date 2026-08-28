@@ -1,15 +1,102 @@
 ---
 import Base from '../layouts/Base.astro';
-
-// SKELETON — structure decided, copy not written. See docs/roadmaps/website.md.
 ---
 
-<Base title="Roadmap — sempods" description="What is built, what is next, and what is deliberately not being built." schemaType="TechArticle">
-  <h1>Roadmap</h1>
-  <p class="lede">What is built, what is next, and what is deliberately not being built.</p>
+<Base
+  title="sempods roadmap — specification, graph retrieval and open tooling"
+  description="What exists in sempods today, what is opening next, and which work matters for the decentralized semantic data pod specification."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">status</p>
+  <h1>Roadmap without theatre</h1>
+
+  <p class="lede">
+    sempods is early. The useful thing is not a list of dates; it is a clear
+    distinction between what runs today, what is being opened next, and what the
+    model needs in order to become broadly useful.
+  </p>
+
+  <div class="status-list">
+    <section>
+      <h2>Running today</h2>
+      <ul>
+        <li>public pods serving real event data as JSON-LD</li>
+        <li>Kotlin reference implementation</li>
+        <li>Linked Data CRUD over HTTP</li>
+        <li>SPARQL endpoint with server-enforced context sandboxing</li>
+        <li>OAuth-based authorization with context-scoped grants</li>
+        <li>pod MCP endpoint at <code>/_system/mcp</code></li>
+        <li><a href="https://apps.sempods.org">preview apps</a> that connect to pods by URL</li>
+        <li>hosted test pods available on request</li>
+        <li>JVM artifacts published for people who want to build against it</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Opening next</h2>
+      <ul>
+        <li><code>sempods-spec</code>, the dedicated specification repository</li>
+        <li>an OpenAPI contract for the public pod surface</li>
+        <li>a public TypeScript SDK</li>
+        <li>search and optional vector retrieval adapters behind <code>find</code></li>
+        <li>simpler examples that do not require starting with the server internals</li>
+        <li>better try-it-out paths from the website</li>
+      </ul>
+    </section>
+  </div>
+
+  <h2>Model work</h2>
+
   <p>
-    This page is not written yet. The <a href="/">home page</a> carries the short
-    version, and the <a href="https://github.com/sempods/sempods-kotlin">reference
-    implementation</a> carries the long one.
+    The concrete technical work now is graph retrieval: <code>find</code> as the
+    semantic entry point, structural traversal through Linked Data, and MCP tools
+    that expose the same pattern to agents.
+  </p>
+
+  <p>
+    SHACL shapes and a TBox model are still design work, not final
+    specification. They may become the place where apps describe expected shapes
+    and shared semantics, but the public contract should not pretend that is
+    settled.
+  </p>
+
+  <p>
+    Permission work is in the same category: contexts are the working boundary
+    today, while alignment with ACP-style and finer-grained authorization remains
+    under active design.
+  </p>
+
+  <h2>Agent layer</h2>
+
+  <p>
+    AI agents are clients of the pod model. The direction here is graph
+    retrieval, MCP, local or personal memory contexts, and provider-independent
+    reasoning over the relevant slice of knowledge.
+  </p>
+
+  <p>
+    The principle should stay simple: the agent sees what its token allows. No
+    special permission model, no hidden path around the pod.
+  </p>
+
+  <h2>Ecosystem</h2>
+
+  <p>
+    The long-term goal is not one hosted sempods platform. It is an open,
+    decentralized and federated knowledge web where multiple implementations and
+    products can interoperate.
+  </p>
+
+  <p>
+    That is why early product interest matters even before public partners can
+    be named. If independent teams adopt the same open model for their own
+    knowledge-management problems, the personal data vision becomes more
+    realistic, not less.
+  </p>
+
+  <p class="action-links">
+    <a href="/start">Try what runs today</a>
+    <a href="/concepts/graph-retrieval">Read graph retrieval</a>
+    <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 </Base>

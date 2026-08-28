@@ -1,0 +1,72 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="sempods concepts — graph retrieval, federated identity and pod permissions"
+  description="Technical concepts behind sempods: graph retrieval, find, Linked Open Data, federated identity, context permissions, MCP and Linked Data CRUD."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">concepts</p>
+  <h1>Technical depth without turning the site into a manual</h1>
+
+  <p class="lede">
+    The home page should stay readable. This section is for the person who wants
+    to know whether the architecture holds up: how an app or agent finds useful
+    data, follows links, respects permissions and keeps working across pods.
+  </p>
+
+  <div class="concept-list">
+    <article>
+      <h2><a href="/concepts/graph-retrieval">Graph retrieval</a></h2>
+      <p>
+        The first deep dive: why retrieval starts with resources and links, not
+        document chunks, and why <code>find</code> is the entry point rather
+        than the whole search story.
+      </p>
+    </article>
+
+    <article>
+      <h2><a href="/concepts/federated-grants">Linked Open Data and federated grants</a></h2>
+      <p>
+        WebIDs, app DIDs, aliases and grants are the identity side of the model:
+        apps should connect to pods without every product becoming the account
+        system.
+      </p>
+    </article>
+
+    <article>
+      <h2><a href="/concepts/context-permissions">Context permissions</a></h2>
+      <p>
+        Contexts are the current permission boundary in the reference
+        implementation. The authorization model is still being aligned with more
+        expressive work such as ACP, but contexts remain the useful way to talk
+        about visibility.
+      </p>
+    </article>
+
+    <article>
+      <h2><a href="/concepts/mcp-over-pods">MCP over pods</a></h2>
+      <p>
+        MCP is another client surface over the same pod rules. Multi-pod MCP is
+        interesting because an agent can query independent data spaces instead
+        of one central memory service.
+      </p>
+    </article>
+
+    <article>
+      <h2><a href="/concepts/linked-data-crud">Linked Data CRUD</a></h2>
+      <p>
+        CRUD sounds ordinary because the web is ordinary. That is the point:
+        resources can be addressed, read and written over HTTP instead of being
+        hidden behind one SDK.
+      </p>
+    </article>
+  </div>
+
+  <p class="action-links">
+    <a href="/concepts/graph-retrieval">Read graph retrieval</a>
+    <a href="/concepts/federated-grants">Read federated grants</a>
+    <a href="/how-it-works">Back to the model</a>
+  </p>
+</Base>

@@ -13,6 +13,8 @@ interface Props {
 const { title, description, schemaType = 'WebPage', wide = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const measure = wide ? 'measure-wide' : 'measure';
+const currentPath = Astro.url.pathname;
+const ogType = schemaType === 'WebSite' ? 'website' : 'article';
 
 /*
  * Structured data on every page, and it is not an SEO trick here: a project that
@@ -25,9 +27,14 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': schemaType,
   name: title,
+  ...(schemaType === 'TechArticle' ? { headline: title } : {}),
   description,
   url: canonical.href,
   inLanguage: 'en',
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': canonical.href,
+  },
   isPartOf: {
     '@type': 'WebSite',
     name: 'sempods',
@@ -43,11 +50,17 @@ const jsonLd = {
 
 const nav = [
   { href: '/how-it-works', label: 'How it works' },
+  { href: '/concepts', label: 'Concepts' },
   { href: '/use-cases', label: 'Use cases' },
   { href: '/start', label: 'Start' },
   { href: '/roadmap', label: 'Roadmap' },
   { href: '/search', label: 'Search' },
 ];
+
+const isCurrentNavItem = (href: string) => {
+  const normalizedHref = href.endsWith('/') ? href : `${href}/`;
+  return currentPath === href || currentPath.startsWith(normalizedHref);
+};
 ---
 
 <!doctype html>
@@ -57,14 +70,16 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href={canonical.href} />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:site_name" content="sempods" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary" />
 
     <link rel="sitemap" href="/sitemap-index.xml" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -75,7 +90,17 @@ const nav = [
       <div class="measure-wide row">
         <a class="wordmark" href="/">sempods</a>
         <nav class="site-nav">
-          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                class:list={{ active: isCurrentNavItem(item.href) }}
+                aria-current={isCurrentNavItem(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            ))
+          }
         </nav>
       </div>
     </header>
@@ -94,12 +119,55 @@ const nav = [
           sempods is a specification with a reference implementation. Code under
           Apache&nbsp;2.0, documentation under CC&nbsp;BY&nbsp;4.0.
         </p>
-        <p>
-          <a href="https://github.com/sempods/sempods-kotlin">GitHub</a> ·
-          <a href="https://github.com/sempods/sempods-kotlin/discussions">Discussions</a> ·
-          <a href="mailto:hello@sempods.org">hello@sempods.org</a>
-        </p>
+        <ul class="footer-links" aria-label="Project links">
+          <li><a href="https://github.com/sempods/sempods-kotlin">GitHub</a></li>
+          <li><a href="https://github.com/sempods/sempods-kotlin/discussions">Discussions</a></li>
+          <li><a href="mailto:hello@sempods.org">hello@sempods.org</a></li>
+        </ul>
       </div>
     </footer>
+
+    <script is:inline>
+      document.querySelectorAll('pre').forEach((pre) => {
+        if (pre.parentElement?.classList.contains('code-frame')) return;
+        if (pre.matches('[data-no-copy]')) return;
+
+        const frame = document.createElement('div');
+        frame.className = 'code-frame';
+        pre.replaceWith(frame);
+        frame.append(pre);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'copy-code';
+        button.setAttribute('aria-label', 'Copy code block');
+        button.addEventListener('click', async () => {
+          const text = pre.innerText;
+
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.append(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+          }
+
+          button.classList.add('copied');
+          button.setAttribute('aria-label', 'Code copied');
+          window.setTimeout(() => {
+            button.classList.remove('copied');
+            button.setAttribute('aria-label', 'Copy code block');
+          }, 1400);
+        });
+
+        frame.prepend(button);
+      });
+    </script>
   </body>
 </html>

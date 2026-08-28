@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="Context permissions in sempods — named graphs, grants and AuthZ"
+  description="How sempods uses contexts as the current permission boundary, with read, write and manage grants resolved server-side for apps, agents and public Linked Data."
+  schemaType="TechArticle"
+>
+  <p class="eyebrow">concepts · permissions</p>
+  <h1>Permissions should follow the graph, not the app</h1>
+
+  <p class="lede">
+    In the current reference implementation, a context is the permission
+    boundary. It is a named graph inside a pod: a place where statements live and
+    where read, write and manage authority can be granted.
+  </p>
+
+  <p>
+    Contexts are deliberately smaller than products. A calendar app can read a
+    public event context. A private planning app can write to an internal
+    context. An agent can see only the contexts its token grants.
+  </p>
+
+  <pre class="ascii-diagram" data-no-copy aria-label="One resource can have statements in public and private contexts">{`same resource URI
+      |
+      +--> public context
+      |      title, date, location
+      |
+      +--> private context
+             notes, drafts, internal status`}</pre>
+
+  <h2>The current grant shape</h2>
+
+  <p>
+    The working model attaches grants to context IRIs. The permissions are
+    <code>read</code>, <code>write</code> and <code>manage</code>. Public reads
+    are handled as a public-read capability over contexts the pod exposes to the
+    open web.
+  </p>
+
+  <p>
+    The important implementation detail is that context permissions are resolved
+    server-side on each request. Access tokens stay slim. If a grant is revoked,
+    the next request sees the reduced context set.
+  </p>
+
+  <div class="proof">
+    <h3>Downscope, not disclosure</h3>
+    <p>
+      Read surfaces can accept a context downscope. Unknown or unreadable
+      contexts are silently excluded, so a caller cannot use errors to map
+      private context topology.
+    </p>
+    <p class="evidence">
+      The server returns the readable slice, not a diagnostic tour of what the
+      caller failed to access.
+    </p>
+  </div>
+
+  <h2>Why contexts are useful</h2>
+
+  <p>
+    Contexts let the same resource carry different depth for different callers.
+    A venue can publish an event publicly and keep booking notes private. A
+    company can expose product knowledge to support tools while holding internal
+    planning facts back.
+  </p>
+
+  <p>
+    This is also what makes graph retrieval safer. <code>find</code>, resource
+    reads, SPARQL and MCP tools can all work over the same effective readable
+    contexts instead of each surface inventing its own permissions.
+  </p>
+
+  <h2>Where ACP may fit</h2>
+
+  <p>
+    The authorization model is being reconsidered toward ACP-style and more
+    fine-grained AuthZ. That should not be hidden. The website should not claim
+    that context grants are the final word.
+  </p>
+
+  <p>
+    The stable idea is weaker and more important: permissions must be enforced
+    by the pod, must survive different client surfaces, and must let data stay
+    in the owner's space while apps come and go.
+  </p>
+
+  <p class="action-links">
+    <a href="/concepts">Back to concepts</a>
+    <a href="/concepts/mcp-over-pods">Next: MCP over pods</a>
+    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/authorization.md">Implementation notes</a>
+  </p>
+</Base>
