@@ -2,9 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// The site is served from www.sempods.org. `sempods.org` itself is the pod URI
-// namespace — every first path segment there is a pod name — so the website
-// cannot live under it. See docs/roadmaps/website.md in the planning repo.
+// The canonical site URL stays on www for GitHub Pages output. The apex can
+// also show the website, while concrete pod URLs may live below it, such as
+// https://sempods.org/aaltra.
 export default defineConfig({
   site: 'https://www.sempods.org',
   integrations: [sitemap()],
