@@ -43,3 +43,18 @@ are out of date. Mine it, do not paste it.
 Home and Start carry draft copy. How it works, Use cases and Roadmap are skeletons.
 The decisions behind the structure — and what is still open — are recorded in
 `docs/roadmaps/website.md` in the planning repo.
+
+## Licensing
+
+Two licences, because this repository holds two kinds of thing — the split
+`CONTRIBUTING` already draws across the project:
+
+- **`LICENSE` — CC BY 4.0** covers the content: the pages, the prose, the
+  diagrams. Same licence as [`sempods-spec`](https://github.com/sempods/sempods-spec),
+  and the reason the repository reads as CC BY on GitHub. The text is the product
+  here.
+- **`LICENSE-CODE` — Apache 2.0** covers the code: the Astro configuration,
+  layouts, components and build setup. Same licence as
+  [`sempods-kotlin`](https://github.com/sempods/sempods-kotlin).
+
+Reuse a page: attribute it. Reuse the layout machinery: Apache terms.

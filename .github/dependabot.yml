@@ -1,0 +1,31 @@
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+version: 2
+
+updates:
+  # npm: Astro and its build chain. Grouped so a week's worth of patch/minor bumps
+  # arrives as one reviewable PR rather than a fan of them — a static site pulls in
+  # a few hundred transitive packages, and ungrouped that is the state in which these
+  # stop being read at all. Major bumps stay ungrouped: an Astro major has migration
+  # notes and deserves its own look.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # The workflow `uses:` pins. A pinned action is a supply-chain dependency like any
+  # other and nothing else bumps it — checkout, setup-node and the Pages actions would
+  # otherwise drift and silently miss security fixes.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
