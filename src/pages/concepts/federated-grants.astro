@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 ---
 
 <Base
-  title="Federated grants in sempods — WebID, app DID and Linked Open Data"
+  title="Federated grants in sempods"
   description="How sempods uses WebID-style identities, app DIDs, aliases and grants so apps and agents can work with pod data without becoming the central account system."
   schemaType="TechArticle"
 >
@@ -23,7 +23,7 @@ import Base from '../../layouts/Base.astro';
     written to an identifier the pod can reason about.
   </p>
 
-  <pre class="ascii-diagram" data-no-copy aria-label="A person grants an app access to selected pod contexts">{`person WebID
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="A person grants an app access to selected pod contexts">{`person WebID
      |
      | user-level grant
      v
@@ -99,7 +99,7 @@ pod contexts
 
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/context-permissions">Next: context permissions</a>
+    <a href="/concepts/mcp-over-pods">Next: MCP over pods</a>
     <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/identity.md">Implementation notes</a>
   </p>
 </Base>

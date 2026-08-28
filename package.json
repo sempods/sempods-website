@@ -13,6 +13,7 @@
     "astro": "^7.2.8"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "pagefind": "^1.4.0",
     "typescript": "^5.9.0"
   }

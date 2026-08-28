@@ -14,6 +14,7 @@ SELECT ?e ?name ?start WHERE {
   title="sempods — your data belongs to you"
   description="sempods is an open specification for decentralized semantic data pods: data spaces where apps, websites and AI agents work with structured linked data under the owner's control."
   schemaType="WebSite"
+  copyCode
 >
   <p class="eyebrow">open specification · reference implementation · live pods</p>
   <h1>Your data belongs to you</h1>
@@ -29,42 +30,6 @@ SELECT ?e ?name ?start WHERE {
     it as structured linked data, and let apps, websites and agents come to it
     with permission. The pod is not just storage. It is where ownership, meaning
     and access control meet.
-  </p>
-
-  <pre class="ascii-diagram" data-no-copy aria-label="Apps, websites and agents connect to one pod controlled by the data owner">{`clients can change
-
-+---------+   +----------+   +---------+
-| apps    |   | websites |   | agents  |
-+---------+   +----------+   +---------+
-      \\          |          /
-       \\         |         /
-        v        v        v
-
-        +----------------------+
-        | your pod             |
-        | data + meaning       |
-        | grants + provenance  |
-        +----------------------+
-
-the data stays where ownership lives`}</pre>
-
-  <p>
-    The result is not another backend-as-a-service. It is a data layer for the
-    open web: addressable by HTTP, readable as JSON-LD, queryable with SPARQL,
-    and built so different implementations can speak the same contract.
-  </p>
-
-  <p>
-    The direction is close to the old promise of the web: decentralized,
-    federated, linkable knowledge that no single product has to own. sempods is
-    inspired by the same values as Solid, but takes its own route: semantic pods,
-    context-based permissions, SPARQL, JSON-LD and MCP as one coherent model.
-  </p>
-
-  <p class="action-links">
-    <a href="#try">Query a live pod</a>
-    <a href="/how-it-works">See how it works</a>
-    <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 
   <section id="try" class="try-block" aria-labelledby="try-title">
@@ -135,6 +100,42 @@ the data stays where ownership lives`}</pre>
 
   <hr class="divider" />
 
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="Apps, websites and agents connect to one pod controlled by the data owner">{`clients can change
+
++---------+   +----------+   +---------+
+| apps    |   | websites |   | agents  |
++---------+   +----------+   +---------+
+      \\          |          /
+       \\         |         /
+        v        v        v
+
+        +----------------------+
+        | your pod             |
+        | data + meaning       |
+        | grants + provenance  |
+        +----------------------+
+
+the data stays where ownership lives`}</pre>
+
+  <p>
+    The result is not another backend-as-a-service. It is a data layer for the
+    open web: addressable by HTTP, readable as JSON-LD, queryable with SPARQL,
+    and built so different implementations can speak the same contract.
+  </p>
+
+  <p>
+    The direction is close to the old promise of the web: decentralized,
+    federated, linkable knowledge that no single product has to own. sempods is
+    inspired by the same values as Solid, but takes its own route: semantic pods,
+    context-based permissions, SPARQL, JSON-LD and MCP as one coherent model.
+  </p>
+
+  <p class="action-links">
+    <a href="#try">Query a live pod</a>
+    <a href="/how-it-works">See how it works</a>
+    <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
+  </p>
+
   <h2>AI should not own your memory</h2>
 
   <p>
@@ -192,7 +193,7 @@ the data stays where ownership lives`}</pre>
         <li>server-enforced SPARQL sandbox over context permissions</li>
         <li>pod MCP endpoint at <code>/_system/mcp</code></li>
         <li><a href="https://apps.sempods.org">preview apps</a> built against the SDK</li>
-        <li><a href="mailto:danilo@sempods.org">hosted test pods</a> available on request</li>
+        <li>hosted test pods by request via <a href="mailto:danilo@sempods.org">email</a></li>
       </ul>
     </section>
     <section>

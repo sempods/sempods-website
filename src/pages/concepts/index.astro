@@ -3,26 +3,36 @@ import Base from '../../layouts/Base.astro';
 ---
 
 <Base
-  title="sempods concepts — graph retrieval, federated identity and pod permissions"
+  title="sempods concepts — contexts, retrieval and MCP"
   description="Technical concepts behind sempods: graph retrieval, find, Linked Open Data, federated identity, context permissions, MCP and Linked Data CRUD."
   schemaType="TechArticle"
 >
   <p class="eyebrow">concepts</p>
-  <h1>Technical depth without turning the site into a manual</h1>
+  <h1>Contexts are the backbone. Retrieval is where it gets useful.</h1>
 
   <p class="lede">
     The home page should stay readable. This section is for the person who wants
-    to know whether the architecture holds up: how an app or agent finds useful
-    data, follows links, respects permissions and keeps working across pods.
+    to know whether the architecture holds up: how contexts keep the graph
+    permission-aware, and how apps or agents then find useful data, follow links
+    and keep working across pods.
   </p>
 
   <div class="concept-list">
     <article>
+      <h2><a href="/concepts/context-permissions">Context permissions</a></h2>
+      <p>
+        Contexts are the current permission boundary in the reference
+        implementation. Read this first if you want the primitive the other
+        concepts rely on.
+      </p>
+    </article>
+
+    <article>
       <h2><a href="/concepts/graph-retrieval">Graph retrieval</a></h2>
       <p>
-        The first deep dive: why retrieval starts with resources and links, not
-        document chunks, and why <code>find</code> is the entry point rather
-        than the whole search story.
+        Retrieval starts with resources and links, not document chunks.
+        <code>find</code> gives a permission-aware foothold; traversal does the
+        deeper work.
       </p>
     </article>
 
@@ -32,16 +42,6 @@ import Base from '../../layouts/Base.astro';
         WebIDs, app DIDs, aliases and grants are the identity side of the model:
         apps should connect to pods without every product becoming the account
         system.
-      </p>
-    </article>
-
-    <article>
-      <h2><a href="/concepts/context-permissions">Context permissions</a></h2>
-      <p>
-        Contexts are the current permission boundary in the reference
-        implementation. The authorization model is still being aligned with more
-        expressive work such as ACP, but contexts remain the useful way to talk
-        about visibility.
       </p>
     </article>
 
@@ -65,8 +65,8 @@ import Base from '../../layouts/Base.astro';
   </div>
 
   <p class="action-links">
+    <a href="/concepts/context-permissions">Read context permissions</a>
     <a href="/concepts/graph-retrieval">Read graph retrieval</a>
     <a href="/concepts/federated-grants">Read federated grants</a>
-    <a href="/how-it-works">Back to the model</a>
   </p>
 </Base>

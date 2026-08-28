@@ -53,7 +53,6 @@ body {
   font-family: var(--serif);
   font-size: 1.1875rem;
   line-height: 1.7;
-  overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -332,14 +331,14 @@ main { padding-top: 3.5rem; }
 /* ---- guided blocks ----------------------------------------------------- */
 
 .try-block {
-  width: 100vw;
-  margin: 4rem 0 3.8rem 50%;
+  margin: 4rem 0 3.8rem;
   padding: 3.2rem 1.5rem 3.4rem;
-  transform: translateX(-50%);
   background:
-    linear-gradient(to bottom, var(--rule), var(--rule)) 0 0 / 100% 1px no-repeat,
-    linear-gradient(to bottom, var(--rule), var(--rule)) 0 100% / 100% 1px no-repeat,
+    linear-gradient(to bottom, var(--rule), var(--rule)) 50% 0 / 100vw 1px no-repeat,
+    linear-gradient(to bottom, var(--rule), var(--rule)) 50% 100% / 100vw 1px no-repeat,
     linear-gradient(to bottom, var(--paper-raised), var(--paper-raised));
+  box-shadow: 0 0 0 100vmax var(--paper-raised);
+  clip-path: inset(0 -100vmax);
 }
 .try-block h2 { margin-top: 0; }
 .try-block .eyebrow { margin-bottom: 0.45rem; }

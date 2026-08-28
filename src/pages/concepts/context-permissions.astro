@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 ---
 
 <Base
-  title="Context permissions in sempods — named graphs, grants and AuthZ"
+  title="Context permissions in sempods"
   description="How sempods uses contexts as the current permission boundary, with read, write and manage grants resolved server-side for apps, agents and public Linked Data."
   schemaType="TechArticle"
 >
@@ -22,7 +22,7 @@ import Base from '../../layouts/Base.astro';
     context. An agent can see only the contexts its token grants.
   </p>
 
-  <pre class="ascii-diagram" data-no-copy aria-label="One resource can have statements in public and private contexts">{`same resource URI
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="One resource can have statements in public and private contexts">{`same resource URI
       |
       +--> public context
       |      title, date, location
@@ -89,7 +89,7 @@ import Base from '../../layouts/Base.astro';
 
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/mcp-over-pods">Next: MCP over pods</a>
+    <a href="/concepts/graph-retrieval">Next: graph retrieval</a>
     <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/authorization.md">Implementation notes</a>
   </p>
 </Base>
