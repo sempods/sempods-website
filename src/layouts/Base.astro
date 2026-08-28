@@ -8,8 +8,6 @@ interface Props {
   schemaType?: 'WebSite' | 'TechArticle' | 'WebPage';
   /** Wide measure for pages that carry tables or long code. */
   wide?: boolean;
-  /** Add copy affordances to executable code blocks. */
-  copyCode?: boolean;
 }
 
 const {
@@ -17,7 +15,6 @@ const {
   description,
   schemaType = 'WebPage',
   wide = false,
-  copyCode = false,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const measure = wide ? 'measure-wide' : 'measure';
@@ -135,43 +132,5 @@ const isCurrentNavItem = (href: string) => {
       </div>
     </footer>
 
-    {
-      copyCode && (
-        <script is:inline>
-          document.querySelectorAll('pre').forEach((pre) => {
-            if (pre.parentElement?.classList.contains('code-frame')) return;
-            if (pre.matches('[data-no-copy]')) return;
-
-            const frame = document.createElement('div');
-            frame.className = 'code-frame';
-            pre.replaceWith(frame);
-            frame.append(pre);
-
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'copy-code';
-            button.setAttribute('aria-label', 'Copy code block');
-            button.addEventListener('click', async () => {
-              const text = pre.innerText;
-
-              try {
-                await navigator.clipboard.writeText(text);
-                button.classList.add('copied');
-                button.setAttribute('aria-label', 'Code copied');
-              } catch {
-                button.setAttribute('aria-label', 'Copy failed');
-              }
-
-              window.setTimeout(() => {
-                button.classList.remove('copied');
-                button.setAttribute('aria-label', 'Copy code block');
-              }, 1400);
-            });
-
-            frame.prepend(button);
-          });
-        </script>
-      )
-    }
   </body>
 </html>
