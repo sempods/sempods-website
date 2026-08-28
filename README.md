@@ -2,6 +2,8 @@
 
 The site at [www.sempods.org](https://www.sempods.org). Astro, static, published to
 GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`.
+`https://sempods.org` can also show the website, but it is not a public
+pod-hosting dashboard.
 
 ```bash
 npm install
@@ -9,19 +11,17 @@ npm run dev      # http://localhost:4321
 npm run build    # astro build, then pagefind over dist/
 ```
 
-## Why Pages, and why not the apex
+## Why Pages and explicit pod URLs
 
 Netlify manages an apex domain and its `www` as a pair: it cannot serve
-`www.sempods.org` without also claiming `sempods.org`. That host is the pod server,
-so the certificate request never completes and the domain configuration stays
-locked. Pages has no such coupling — `public/CNAME` carries the domain and that is
-the whole setup.
+`www.sempods.org` without also claiming `sempods.org`. Concrete pod URLs can also
+live under the apex, for example `https://sempods.org/aaltra`, so domain routing
+must stay explicit. Pages has no such coupling — `public/CNAME` carries the
+GitHub Pages domain and that is the whole setup here.
 
-The site cannot live on `sempods.org` itself either, and that is architecture
-rather than convenience: every first path segment there is a pod name
-(`sempods.org/{pod}/{path}`). A multi-page site would permanently take `/about`,
-`/start` and every other top-level path out of the pod namespace, and those
-identifiers are promised not to change.
+Do not link `https://sempods.org` as though it were a hosting dashboard. There is
+no public entry UI for pod hosting yet. Link concrete pod URLs directly when a
+page intentionally points at a pod.
 
 ## Content
 

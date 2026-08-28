@@ -1,7 +1,8 @@
 # sempods website
 
 The site at [www.sempods.org](https://www.sempods.org). Static, Astro, published to
-GitHub Pages.
+GitHub Pages. The apex [sempods.org](https://sempods.org) can also show the
+website, but do not present it as a public pod-hosting entry UI.
 
 **This file described a Next.js chat app until 2026-08-27.** That iteration is over —
 the chat is deferred, not deleted, and lives in this repository's history. If you are
@@ -16,13 +17,14 @@ are part of the current site by decision.
 - No webfonts, no client JavaScript beyond the search widget
 
 Why Pages and not Netlify: Netlify manages an apex and its `www` as a pair and cannot
-serve `www.sempods.org` without also claiming `sempods.org`. That host is the pod
-server, so the certificate request never completes and the domain configuration stays
-locked. `public/CNAME` is the whole setup here.
+serve `www.sempods.org` without also claiming `sempods.org`. Concrete pod URLs can
+also live under the apex, for example `https://sempods.org/aaltra`, so domain
+routing must stay explicit. `public/CNAME` is the GitHub Pages setup here.
 
-Why not `sempods.org` itself: every first path segment there is a pod name. A
-multi-page site would permanently remove `/about`, `/start` and every other top-level
-path from the pod namespace, and those identifiers are promised not to change.
+Do not link `https://sempods.org` as though it were a hosting dashboard. There is no
+public entry UI for pod hosting yet. Specific pod URLs such as
+`https://sempods.org/aaltra` are fine when the page is intentionally pointing at a
+concrete pod.
 
 ## Content
 
