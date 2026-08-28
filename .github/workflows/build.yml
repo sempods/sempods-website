@@ -1,0 +1,32 @@
+# Build every pull request.
+#
+# `deploy.yml` only runs on a push to `main`, so until this existed a pull request
+# that broke the build was invisible until after it had been merged — the first
+# sign would have been a red deploy on `main` and a site frozen at its previous
+# version. This is the same job the deploy does, minus the publishing, so a break
+# surfaces while it is still someone's branch.
+#
+# The job is named `build` to match the reference implementation, where the branch
+# ruleset requires `build` and `check`.
+name: build
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Runs astro and then pagefind over dist/, exactly as the deploy does. The
+      # search index is part of what can break, so it is part of what is checked.
+      - run: npm run build
