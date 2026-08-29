@@ -59,7 +59,7 @@ import Base from '../layouts/Base.astro';
   <p>
     RDF has a fourth dimension: the named graph, or context. sempods makes that
     context the core authorization primitive. Every statement belongs to exactly
-    one context. Access is granted as <code>read</code>, <code>write</code> or
+    one context. Access is granted as <code>read</code>, <code>write</code> or{' '}
     <code>manage</code> on contexts.
   </p>
 
@@ -104,7 +104,7 @@ import Base from '../layouts/Base.astro';
   </p>
 
   <p>
-    In the reference implementation, a pod exposes that client path at
+    In the reference implementation, a pod exposes that client path at{' '}
     <code>/_system/mcp</code>. The aaltra pod has one too, which makes the live
     event example testable through more than HTTP and SPARQL.
   </p>
@@ -125,8 +125,8 @@ import Base from '../layouts/Base.astro';
   <h2>Where the model goes deeper</h2>
 
   <p>
-    The next technical layer is graph retrieval: start with a semantic
-    <code>find</code>, inspect the returned graph, then follow URIs through
+    The next technical layer is graph retrieval: start with a semantic{' '}
+    <code>find</code>, inspect the returned graph, then follow URIs through{' '}
     <code>get_resource</code> or SPARQL until the app or agent has the slice of
     knowledge it needs.
   </p>
@@ -136,9 +136,30 @@ import Base from '../layouts/Base.astro';
     contracts. They matter, but they are not the first published deep dive.
   </p>
 
+  <h2>The same model, written to bind</h2>
+
+  <p>
+    Everything above is the readable version. The{' '}
+    <a href="https://spec.sempods.org">specification</a> is the version an
+    implementation is held to: core chapters for contexts, grants, authorization,
+    CRUD, SPARQL and <code>find</code>, plus optional modules for MCP, media and
+    an OIDC bridge. Every normative statement carries an identifier and its own
+    anchor, so a conformance test or an implementation note can cite one line
+    rather than a chapter.
+  </p>
+
+  <p>
+    The vocabulary the requirements are written against resolves too:{' '}
+    <a href="https://schema.sempods.org">schema.sempods.org</a> answers with
+    Turtle or a readable page depending on what asked, and a module identifier
+    reaches its own chapter. That is the same behaviour this page describes for
+    pod resources, applied to the project's own terms.
+  </p>
+
   <p class="action-links">
     <a href="/start">Try a live query</a>
     <a href="/concepts/graph-retrieval">Read graph retrieval</a>
+    <a href="https://spec.sempods.org">Read the specification</a>
     <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 </Base>

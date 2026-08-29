@@ -121,6 +121,7 @@ the data stays where ownership lives`}</pre>
   <p class="action-links">
     <a href="#try">Query a live pod</a>
     <a href="/how-it-works">See how it works</a>
+    <a href="https://spec.sempods.org">Read the specification</a>
     <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 
@@ -166,10 +167,19 @@ the data stays where ownership lives`}</pre>
   </p>
 
   <p>
-    <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is the
-    reference implementation: the working server and client stack that makes the
-    model concrete. The dedicated <code>sempods-spec</code> repository is being
-    prepared and will carry the formal specification and OpenAPI contract.
+    The <a href="https://spec.sempods.org">specification</a> is written and
+    published: core chapters for contexts, grants, authorization, CRUD, SPARQL and{' '}
+    <code>find</code>, optional modules beside them, and an OpenAPI description of
+    the HTTP surface. Every normative statement carries an identifier, so it can
+    be cited rather than paraphrased.
+  </p>
+
+  <p>
+    It is deliberately <em>descriptive</em> until <code>0.1</code> is tagged:
+    where the text and the implementation disagree today, the implementation is
+    right. <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is
+    that implementation — the working server and client stack the specification
+    was extracted from, and the thing it will bind first.
   </p>
 
   <div class="status-list">
@@ -177,7 +187,8 @@ the data stays where ownership lives`}</pre>
       <h3>Running today</h3>
       <ul>
         <li>public pods serving real event data as JSON-LD</li>
-        <li>Kotlin reference implementation and JVM artifacts</li>
+        <li>the <a href="https://spec.sempods.org">specification</a> and its OpenAPI descriptions</li>
+        <li>Kotlin reference implementation and JVM artifacts on Maven Central</li>
         <li>server-enforced SPARQL sandbox over context permissions</li>
         <li>pod MCP endpoint at <code>/_system/mcp</code></li>
         <li><a href="https://apps.sempods.org">preview apps</a> built against the SDK</li>
@@ -187,7 +198,6 @@ the data stays where ownership lives`}</pre>
     <section>
       <h3>Next public surfaces</h3>
       <ul>
-        <li><code>sempods-spec</code> with the OpenAPI contract</li>
         <li>TypeScript SDK and simpler app examples</li>
         <li>better <code>find</code> adapters for search and optional vector retrieval</li>
         <li>semantic contracts such as SHACL and a TBox model under exploration</li>
