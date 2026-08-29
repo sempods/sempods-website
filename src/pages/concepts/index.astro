@@ -30,7 +30,7 @@ import Base from '../../layouts/Base.astro';
     <article>
       <h2><a href="/concepts/graph-retrieval">Graph retrieval</a></h2>
       <p>
-        Retrieval starts with resources and links, not document chunks.
+        Retrieval starts with resources and links, not document chunks.{' '}
         <code>find</code> gives a permission-aware foothold; traversal does the
         deeper work.
       </p>
@@ -63,6 +63,22 @@ import Base from '../../layouts/Base.astro';
       </p>
     </article>
   </div>
+
+  <p>
+    Each page closes by naming where its subject is written down, which is now a
+    different place than it was: the{' '}
+    <a href="https://spec.sempods.org">specification</a> carries the normative
+    text, and <code>sempods-kotlin</code> carries the notes of one implementation
+    of it. These pages are neither — they are the argument for why the model has
+    the shape it has.
+  </p>
+
+  <p>
+    None of it binds anyone yet, and every "Where the contract is written" below
+    should be read that way. Until <code>0.1</code> is tagged the specification is
+    descriptive: it is being extracted from the reference implementation, and
+    where the two disagree the implementation is right.
+  </p>
 
   <p class="action-links">
     <a href="/concepts/context-permissions">Read context permissions</a>

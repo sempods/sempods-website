@@ -97,9 +97,22 @@ pod contexts
     apps should be replaceable.
   </p>
 
+  <h2>Where the contract is written</h2>
+
+  <p>
+    The part that has settled is in the specification.{' '}
+    <a href="https://spec.sempods.org/spec/core/auth/">Authorization and client
+    identity</a> is core: a pod knows a person as a WebID URI, and names the app
+    through its <code>client_id</code>. Arriving through an upstream provider is
+    the optional <a href="https://spec.sempods.org/spec/modules/oidc/">OIDC bridge
+    module</a> — which is the sharper version of the point above, because a pod
+    that identifies people some other way is conformant without it.
+  </p>
+
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
     <a href="/concepts/mcp-over-pods">Next: MCP over pods</a>
+    <a href="https://spec.sempods.org/spec/core/auth/">Read the auth chapter</a>
     <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/identity.md">Implementation notes</a>
   </p>
 </Base>

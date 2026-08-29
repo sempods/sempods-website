@@ -44,14 +44,16 @@ something, run the query and check that it does. A `SELECT` that omits the varia
 the surrounding paragraph talks about is exactly the kind of error a reader finds in
 ten seconds.
 
-`_legacy-content/` is the previous chatbot knowledge base. Raw material, not copy — it
-was written for a model to answer from, not for a human to read, and parts of it are
-out of date. Mine it, do not paste it.
+The chatbot knowledge base that fed the previous site is **not in this repository**.
+A trimmed copy sat at `_legacy-content/` until 2026-08-29 and was deleted: nothing
+built from it, and the full 24 files live in the private planning repo under
+`sempods/internal/website/content/`. Mine that, do not paste it — it was written for
+a model to answer from, not for a human to read, and parts of it are out of date.
 
 ## Tone
 
-`_legacy-content/system-prompt.md` remains the best statement of voice the project
-has, and the site inherits it: conviction earned by argument rather than enthusiasm,
+The chatbot system prompt in that knowledge base remains the best statement of voice
+the project has, and the site inherits it: conviction earned by argument rather than enthusiasm,
 openly unfinished as a strength rather than something to hide, skeptics welcome, never
 salesy. "Here is what it does, and here is what it does not do yet."
 
@@ -86,6 +88,7 @@ without moving an existing URL.
 
 ## Decisions
 
-Structure, what is settled and what is still open: `docs/roadmaps/website.md` in the
-private planning repo. Read it before proposing a change to the information
-architecture — most of it has already been argued through once.
+Structure and the reasoning behind it: `docs/website.md` in the private planning
+repo; what is still open is workstream B of `docs/roadmaps/go-live.md` beside it.
+Read them before proposing a change to the information architecture — most of it has
+already been argued through once.

@@ -34,15 +34,13 @@ that no longer compiles is worse than none — it is the first thing a visitor
 tries. Those come from a compiled source in the reference implementation rather
 than being typed here.
 
-`_legacy-content/` is the previous chatbot knowledge base, kept as raw material.
-It is written for a model to answer from, not for a human to read, and parts of it
-are out of date. Mine it, do not paste it.
-
 ## State
 
-Home and Start carry draft copy. How it works, Use cases and Roadmap are skeletons.
-The decisions behind the structure — and what is still open — are recorded in
-`docs/roadmaps/website.md` in the planning repo.
+Every page carries real copy; none of them are skeletons. What the site still owes
+is a compiled source for code examples — every snippet should come from something
+that builds, and none does yet. The reasoning behind the structure is recorded in
+`docs/website.md` in the planning repo, and what is still open is workstream B of
+`docs/roadmaps/go-live.md` beside it.
 
 ## Licensing
 

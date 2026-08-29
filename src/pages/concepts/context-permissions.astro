@@ -33,7 +33,7 @@ import Base from '../../layouts/Base.astro';
   <h2>The current grant shape</h2>
 
   <p>
-    The working model attaches grants to context IRIs. The permissions are
+    The working model attaches grants to context IRIs. The permissions are{' '}
     <code>read</code>, <code>write</code> and <code>manage</code>. Public reads
     are handled as a public-read capability over contexts the pod exposes to the
     open web.
@@ -87,9 +87,21 @@ import Base from '../../layouts/Base.astro';
     in the owner's space while apps come and go.
   </p>
 
+  <h2>Where the contract is written</h2>
+
+  <p>
+    Since this page was first written, the model stopped being a description of
+    one implementation. <a href="https://spec.sempods.org/spec/core/contexts/">Contexts</a>{' '}
+    and <a href="https://spec.sempods.org/spec/core/grants/">grants</a> are two
+    chapters of the specification, and they are where the normative version
+    lives: every statement in exactly one context, a grant as durable per-context
+    policy, delegation as set intersection, and the whole decision made on the
+    server.
+  </p>
+
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
     <a href="/concepts/graph-retrieval">Next: graph retrieval</a>
-    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/authorization.md">Implementation notes</a>
+    <a href="https://spec.sempods.org/spec/core/grants/">Read the grants chapter</a>
   </p>
 </Base>

@@ -89,9 +89,20 @@ import Base from '../../layouts/Base.astro';
     comfortable.
   </p>
 
+  <h2>Where the contract is written</h2>
+
+  <p>
+    This page argues for the shape. The form written to bind is the{' '}
+    <a href="https://spec.sempods.org/spec/core/lod-crud/">CRUD chapter</a> of the
+    specification: two layers over one store, the LOD layer that addresses a
+    resource at its canonical IRI, and the system layer that addresses a single
+    property slot and is explicit about where RDF set semantics make it deviate
+    from ordinary HTTP.
+  </p>
+
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
     <a href="/start">Try a live query</a>
-    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/lod-crud/lod-layer.md">Implementation notes</a>
+    <a href="https://spec.sempods.org/spec/core/lod-crud/">Read the CRUD chapter</a>
   </p>
 </Base>

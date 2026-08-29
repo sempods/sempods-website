@@ -113,7 +113,7 @@ import Base from '../../layouts/Base.astro';
   </p>
 
   <p>
-    The agent should not own the memory. It should arrive with a grant, use
+    The agent should not own the memory. It should arrive with a grant, use{' '}
     <code>find</code> to locate a useful foothold, traverse what it is allowed
     to read, and leave the knowledge where it belongs.
   </p>
@@ -121,7 +121,7 @@ import Base from '../../layouts/Base.astro';
   <h2>Where MCP fits</h2>
 
   <p>
-    MCP makes the same idea available to agents. The pod MCP endpoint exposes
+    MCP makes the same idea available to agents. The pod MCP endpoint exposes{' '}
     <code>find</code>, resource reads and SPARQL-style traversal as tools, but
     it does not turn AI into a privileged path. A multi-MCP setup is interesting
     for the opposite reason: an agent can work across several independent pods,
@@ -134,9 +134,23 @@ import Base from '../../layouts/Base.astro';
     flattening knowledge into one more private index.
   </p>
 
+  <h2>Where the contract is written</h2>
+
+  <p>
+    "A contract, not an algorithm" is not a phrase this page invented for the
+    occasion. It is the first requirement of the{' '}
+    <a href="https://spec.sempods.org/spec/core/find/">find chapter</a>, written
+    to leave an implementation free to satisfy <code>find</code> with any engine
+    it likes and to stop it making the caller choose one. The chapter covers the
+    built half;
+    the traversal loop above is what clients do with it, and that is design work
+    rather than specified behaviour.
+  </p>
+
   <p class="action-links">
     <a href="/concepts">Back to concepts</a>
     <a href="/concepts/federated-grants">Next: federated grants</a>
+    <a href="https://spec.sempods.org/spec/core/find/">Read the find chapter</a>
     <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/concepts/graph-retrieval.md">Implementation notes</a>
   </p>
 </Base>

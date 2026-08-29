@@ -7,3 +7,5 @@ Source: https://github.com/google/material-design-icons
 
 The SVG wrapper files copied from sempods-spec modify the exported SVG
 structure, accessible labels, colour handling, padding and app-icon background.
+public/images/sempods-social-preview.png is copied from the same directory and
+places that mark on a solid ground with the wordmark and tagline.

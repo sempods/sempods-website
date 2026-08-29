@@ -21,6 +21,16 @@ import Base from '../layouts/Base.astro';
       <h2>Running today</h2>
       <ul>
         <li>public pods serving real event data as JSON-LD</li>
+        <li>
+          the <a href="https://spec.sempods.org">specification</a>, in its own
+          repository and rendered with search and a{' '}
+          <a href="https://spec.sempods.org/api/">try-it client</a> over the
+          OpenAPI descriptions
+        </li>
+        <li>
+          <a href="https://schema.sempods.org">schema.sempods.org</a>, answering
+          with Turtle or a readable page depending on what asked
+        </li>
         <li>Kotlin reference implementation</li>
         <li>Linked Data CRUD over HTTP</li>
         <li>SPARQL endpoint with server-enforced context sandboxing</li>
@@ -28,15 +38,13 @@ import Base from '../layouts/Base.astro';
         <li>pod MCP endpoint at <code>/_system/mcp</code></li>
         <li><a href="https://apps.sempods.org">preview apps</a> that connect to pods by URL</li>
         <li>hosted test pods available on request</li>
-        <li>JVM artifacts published for people who want to build against it</li>
+        <li>JVM artifacts on Maven Central</li>
       </ul>
     </section>
 
     <section>
       <h2>Opening next</h2>
       <ul>
-        <li><code>sempods-spec</code>, the dedicated specification repository</li>
-        <li>an OpenAPI contract for the public pod surface</li>
         <li>a public TypeScript SDK</li>
         <li>search and optional vector retrieval adapters behind <code>find</code></li>
         <li>simpler examples that do not require starting with the server internals</li>
@@ -44,6 +52,23 @@ import Base from '../layouts/Base.astro';
       </ul>
     </section>
   </div>
+
+  <h2>What the specification is not yet</h2>
+
+  <p>
+    It exists, and it is worth reading, but it does not yet bind anyone. Until{' '}
+    <code>0.1</code> is tagged the text is <em>descriptive</em>: it is being
+    extracted from the reference implementation, and where the two disagree the
+    implementation is right. That is also the window in which a requirement can
+    still be renumbered or deleted outright, which stops afterwards and never
+    resumes.
+  </p>
+
+  <p>
+    The distinction matters more than it sounds. A specification that claimed to
+    be normative on the day it was published would be asking for trust it has not
+    earned from a single independent implementation.
+  </p>
 
   <h2>Model work</h2>
 
@@ -96,6 +121,7 @@ import Base from '../layouts/Base.astro';
   <p class="action-links">
     <a href="/start">Try what runs today</a>
     <a href="/concepts/graph-retrieval">Read graph retrieval</a>
+    <a href="https://spec.sempods.org">Read the specification</a>
     <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
   </p>
 </Base>
