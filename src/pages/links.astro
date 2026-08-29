@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import { SEMPODS_VERSION } from '../data/coordinates';
+---
+
+<Base
+  title="Where everything sempods is — repositories, specification and live surfaces"
+  description="An index of the sempods project: the specification and its HTTP surface, the vocabulary, the reference implementation, the published artifacts, the live pods, and where to ask a question."
+>
+  <p class="eyebrow">the index</p>
+  <h1>One page instead of hunting through six hosts</h1>
+
+  <p class="lede">
+    sempods is a specification, an implementation, a set of published artifacts
+    and a handful of hosts that each do exactly one thing. That is the right
+    shape for the project and a bad shape for a first visit, so this page says
+    what each one is and why you would open it.
+  </p>
+
+  <div class="status-list">
+    <section>
+      <h2>Read</h2>
+      <ul>
+        <li>
+          <a href="https://spec.sempods.org">spec.sempods.org</a>{' '}— the
+          specification: core chapters for contexts, grants, authorization, CRUD,
+          SPARQL and <code>find</code>, plus optional modules for MCP, media and
+          an OIDC bridge. Every normative statement carries an identifier and its
+          own anchor, so it can be cited rather than paraphrased. Descriptive
+          until <code>0.1</code>.
+        </li>
+        <li>
+          <a href="https://spec.sempods.org/api/">the HTTP surface</a>{' '}— the
+          OpenAPI descriptions rendered as a client. The closest thing to reading
+          the specification with your hands.
+        </li>
+        <li>
+          <a href="https://schema.sempods.org">schema.sempods.org</a>{' '}— the
+          vocabulary the requirements are written against. It negotiates content:
+          Turtle for a program, a readable page for a browser, and a module
+          identifier reaches its own chapter.
+        </li>
+        <li>
+          <a href="https://spec.sempods.org/GOVERNANCE/">Governance</a>{' '}— how a
+          requirement is added, reworded, withdrawn, and — only until{' '}
+          <code>0.1</code> is tagged — deleted outright.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Code</h2>
+      <ul>
+        <li>
+          <a href="https://github.com/sempods/sempods-spec">sempods-spec</a>{' '}—
+          the specification's repository. The chapters, the OpenAPI descriptions
+          and the vocabulary are all authored here; the rendered site above is
+          built from it.
+        </li>
+        <li>
+          <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}—
+          the reference implementation: server, client, the MCP endpoint and the
+          local deployment. The specification was extracted from it, which is why
+          the implementation currently wins any disagreement.
+        </li>
+        <li>
+          <a href="https://github.com/sempods/sempods-website">sempods-website</a>{' '}—
+          this site. Astro, static, no runtime.
+        </li>
+        <li>
+          <a href="https://github.com/sempods">the sempods organisation</a>{' '}—
+          everything else, including the apps that are still experimental enough
+          not to be linked individually.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Run against</h2>
+      <ul>
+        <li>
+          <a href="/start">a live public pod</a>{' '}— the aaltra venue in Chemnitz
+          serves its events from its own pod. The Start page carries the query;
+          the pod's{' '}
+          <a href="https://sempods.org/aaltra/_system/contexts">context list</a>{' '}
+          is the shorter proof that it is there.
+        </li>
+        <li>
+          <a href="https://central.sonatype.com/namespace/org.sempods">Maven Central</a>{' '}—
+          the JVM artifacts, version {SEMPODS_VERSION}, Java 21 bytecode. The
+          Gradle coordinates are on{' '}<a href="/start">Start</a>.
+        </li>
+        <li>
+          <a href="https://apps.sempods.org">apps.sempods.org</a>{' '}— preview apps
+          that connect to a pod by URL. Early, and honest about it.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Ask</h2>
+      <ul>
+        <li>
+          <a href="https://github.com/sempods/sempods-kotlin/discussions">Discussions</a>{' '}—
+          the open room for the project as a whole, questions about the
+          specification included.
+        </li>
+        <li>
+          Issues, where something is wrong rather than unclear:{' '}
+          <a href="https://github.com/sempods/sempods-kotlin/issues">sempods-kotlin</a>{' '}
+          for behaviour, <a href="https://github.com/sempods/sempods-spec/issues">sempods-spec</a>{' '}
+          for the text.
+        </li>
+        <li>
+          <a href="mailto:hello@sempods.org">hello@sempods.org</a>{' '}— for anything
+          that does not belong in public, a hosted test pod included.
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <p class="action-links">
+    <a href="/start">Start with sempods</a>
+    <a href="/how-it-works">See how it works</a>
+    <a href="https://spec.sempods.org">Read the specification</a>
+  </p>
+</Base>

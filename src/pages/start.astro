@@ -12,17 +12,24 @@ SELECT ?e ?name ?start WHERE {
 ---
 
 <Base
-  title="Start with sempods — query or run a pod"
-  description="Start with sempods by querying a live public pod, reading the Kotlin reference implementation, or building against the published JVM artifacts."
+  title="Start with sempods — query a pod, read the specification, run your own"
+  description="Start with sempods by querying a live public pod, reading the specification, running your own pod, or building against the published JVM artifacts."
   schemaType="TechArticle"
 >
   <p class="eyebrow">try it yourself</p>
   <h1>Start with the part that is real today</h1>
 
   <p class="lede">
-    sempods is still young, so the entry points are not equally polished. The
-    first one takes ten seconds. The deeper ones are for people who want to read
-    or run the reference implementation.
+    Run the query in step 1. It takes ten seconds, needs nothing installed, and
+    it is the fastest thing here that proves something instead of asserting it.
+  </p>
+
+  <p>
+    After that the ladder forks by what brought you here, and the rungs are not
+    equally polished. If you want to know whether the model holds up, step 3 is
+    the specification and the rest is optional. If you want to build something,
+    step 7 is the artifacts. If you want a pod of your own, step 4 is the fast
+    way and step 5 is the honest one.
   </p>
 
   <section class="try-block">
@@ -55,13 +62,45 @@ SELECT ?e ?name ?start WHERE {
     the data lives.
   </p>
 
-  <h2>3. Ask for a hosted test pod</h2>
+  <h2>3. Read the specification</h2>
+
+  <p>
+    Two steps of live data prove that one server behaves a certain way. The{' '}
+    <a href="https://spec.sempods.org">specification</a> is the claim that this is
+    a contract rather than one server's habits: core chapters for contexts,
+    grants, authorization, CRUD, SPARQL and <code>find</code>, optional modules
+    beside them, and every normative statement carrying an identifier so it can
+    be cited instead of paraphrased.
+  </p>
+
+  <p>
+    The <a href="https://spec.sempods.org/api/">HTTP surface</a> is the same
+    thing with a request button: the OpenAPI descriptions rendered as a client.
+  </p>
+
+  <p>
+    It is <em>descriptive</em> until <code>0.1</code> is tagged — it is being
+    extracted from the reference implementation, and where the two disagree the
+    implementation is right. Read it as an accurate description of something that
+    runs, not yet as a promise it will not move.
+  </p>
+
+  <p class="action-links">
+    <a href="https://spec.sempods.org">Read the specification</a>
+    <a href="https://spec.sempods.org/api/">Open the HTTP surface</a>
+  </p>
+
+  <h2>4. Ask for a hosted test pod</h2>
 
   <p>
     Concrete pods can already live under sempods.org paths such as{' '}
-    <a href="https://sempods.org/aaltra">aaltra</a>. There is no public hosting
-    entry UI yet; new pods for early ideas or tests are created manually on
-    request.
+    <code>https://sempods.org/aaltra</code>. A pod base URL is an address, not a
+    page: nothing is served at the root of it today, so the shortest readable
+    proof that a pod is there is its{' '}
+    <a href="https://sempods.org/aaltra/_system/contexts">context list</a>, which
+    an anonymous caller sees as exactly one public context. There is no public
+    hosting entry UI yet; new pods for early ideas or tests are created manually
+    on request.
   </p>
 
   <p>
@@ -71,7 +110,7 @@ SELECT ?e ?name ?start WHERE {
     <a href="mailto:danilo@sempods.org">danilo@sempods.org</a>.
   </p>
 
-  <h2>4. Run your own pod</h2>
+  <h2>5. Run your own pod</h2>
 
   <p>
     The stronger decentralization proof is self-hosting. In{' '}
@@ -90,7 +129,7 @@ SELECT ?e ?name ?start WHERE {
     <a href="https://github.com/sempods/sempods-kotlin/tree/main/deployments/local">Open local deployment</a>
   </p>
 
-  <h2>5. Read or run the reference implementation</h2>
+  <h2>6. Read or run the reference implementation</h2>
 
   <p>
     <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is the
@@ -105,12 +144,13 @@ SELECT ?e ?name ?start WHERE {
   </p>
 
   <p>
-    It is not meant to be the only implementation. It is the executable proof
-    while the dedicated <code>sempods-spec</code> repository and OpenAPI contract
-    are being prepared.
+    It is not meant to be the only implementation — it is the one the{' '}
+    <a href="https://spec.sempods.org">specification</a> was extracted from, which
+    is a different claim. A second implementation would be written against the
+    text; this one is what the text currently describes.
   </p>
 
-  <h2>6. Build against the JVM artifacts</h2>
+  <h2>7. Build against the JVM artifacts</h2>
 
   <p>
     The artifacts are on Maven Central. Until a compiled quickstart example is
@@ -120,16 +160,18 @@ SELECT ?e ?name ?start WHERE {
   <pre><code>{gradleDependencies}</code></pre>
 
   <p>
-    Version {SEMPODS_VERSION}, Java 21 bytecode. <code>SempodsPodClient</code>
+    Version {SEMPODS_VERSION}, Java 21 bytecode. <code>SempodsPodClient</code>{' '}
     covers reading, writing, contexts and SPARQL.
   </p>
 
-  <h2>7. Try the preview apps</h2>
+  <h2>8. Try the preview apps</h2>
 
   <p>
     <a href="https://apps.sempods.org">apps.sempods.org</a>{' '}is an early
-    collection of apps that connect to a pod by URL. Focus is a todo app,
-    Explorer visualizes the graph, and Konsum is a small shopping-list app.
+    collection of apps that connect to a pod by URL. Explorer visualizes the
+    graph and is the one worth opening first. Focus, a todo app, and Konsum, a
+    shopping list, are experimental enough that they are not linked directly from
+    here.
   </p>
 
   <p>
@@ -163,16 +205,16 @@ SELECT ?e ?name ?start WHERE {
 
   <p class="action-links app-links">
     <a href="https://apps.sempods.org/explorer/">Open Explorer</a>
-    <a href="https://apps.sempods.org/focus/">Open Focus</a>
     <a href="https://apps.sempods.org">See preview apps</a>
   </p>
 
-  <h2>8. Wait for the easier path</h2>
+  <h2>What is not here yet</h2>
 
   <p>
     The public TypeScript SDK is the next important surface for app builders.
     Once it is open, this page should shift from "read the reference
-    implementation" toward "build a small app against a pod".
+    implementation" toward "build a small app against a pod". It is the one rung
+    of the ladder that is missing rather than rough.
   </p>
 
   <p>
@@ -188,5 +230,11 @@ SELECT ?e ?name ?start WHERE {
     <a href="https://github.com/sempods/sempods-kotlin/issues">Open an issue</a>.
     A first-run problem is one of the most useful reports a project at this
     stage can receive.
+  </p>
+
+  <p>
+    Looking for something this page does not cover — the repositories, the
+    vocabulary, the published artifacts, where to ask a question?{' '}
+    <a href="/links">Everything sempods is, on one page</a>.
   </p>
 </Base>
