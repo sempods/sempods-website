@@ -37,8 +37,8 @@ than being typed here.
 ## State
 
 Every page carries real copy; none of them are skeletons. What the site still owes
-is a links page, a compiled source for code examples, and a decision about what a
-first-time reader is asked to do. The reasoning behind the structure is recorded in
+is a compiled source for code examples — every snippet should come from something
+that builds, and none does yet. The reasoning behind the structure is recorded in
 `docs/website.md` in the planning repo, and what is still open is workstream B of
 `docs/roadmaps/go-live.md` beside it.
 
