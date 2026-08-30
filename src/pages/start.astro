@@ -74,6 +74,14 @@ SELECT ?e ?name ?start WHERE {
   </p>
 
   <p>
+    The contract is intentionally built from known standards. A new implementation
+    should not need a new graph database, a new auth framework or a new query
+    engine before it can begin. It needs to make the profiled stack agree on the
+    sempods rules: one pod base URL, one context per statement, grants resolved
+    by the server and the same sandbox across HTTP, SPARQL and MCP.
+  </p>
+
+  <p>
     The <a href="https://spec.sempods.org/api/">HTTP surface</a> is the same
     thing with a request button: the OpenAPI descriptions rendered as a client.
   </p>
