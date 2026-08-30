@@ -13,7 +13,9 @@ import Base from '../layouts/Base.astro';
   <p class="lede">
     sempods is easier to understand if you do not start with apps. Start with
     the data: every thing has an address, every statement has meaning, and every
-    statement belongs to a context.
+    statement belongs to a context. The architecture is new mostly in how it
+    binds familiar standards together, not in asking implementers to adopt a
+    new storage model from scratch.
   </p>
 
   <pre class="ascii-diagram" role="img" data-no-copy aria-label="HTTP, SPARQL and MCP use the same context permissions and RDF graph">{`HTTP resources     SPARQL queries      MCP tools
@@ -25,6 +27,14 @@ import Base from '../layouts/Base.astro';
                     |
                     v
               one RDF graph`}</pre>
+
+  <p>
+    That framing matters. sempods does not replace HTTP, RDF, JSON-LD, SPARQL,
+    OAuth/OIDC or MCP. It uses them to support one organizing boundary: the
+    context. The specification adds the rules that make a context mean the same
+    thing across resource reads, writes, queries, grants and, when implemented,
+    agent tools.
+  </p>
 
   <h2>1. Resources are web addresses</h2>
 

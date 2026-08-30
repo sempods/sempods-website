@@ -17,6 +17,13 @@ import Base from '../../layouts/Base.astro';
   </p>
 
   <p>
+    The value is not that sempods replaces HTTP, RDF stores or JSON tooling. It
+    keeps those parts ordinary so the new contract can stay narrow: which URI is
+    the resource, which context receives a write, and which statements a caller
+    is allowed to see.
+  </p>
+
+  <p>
     sempods exposes resources at their own pod URLs. A client can dereference a
     URI and receive JSON-LD. With the right grant, it can replace, patch or
     delete the resource's outgoing statements in a specific context.

@@ -48,6 +48,13 @@ SELECT ?e ?name ?start WHERE {
     </p>
   </section>
 
+  <p>
+    The familiar pieces are deliberate. sempods is not trying to win by inventing
+    a new database, query language, auth system or agent protocol. Its claim is
+    that HTTP resources, RDF, JSON-LD, SPARQL, OAuth/OIDC and MCP become much
+    more useful when they are fitted into one small pod contract.
+  </p>
+
   <h2 class="after-band">One response, three claims</h2>
 
   <div class="proof">
@@ -112,10 +119,18 @@ the data stays where ownership lives`}</pre>
   </p>
 
   <p>
+    That is a feature, not a compromise. A pod implementer should be able to
+    reach for RDF stores, HTTP frameworks, OAuth libraries and existing SPARQL
+    tooling, then spend the hard work on the contract: contexts as the permission
+    boundary, server-enforced sandboxing, stable resource IRIs and, when the MCP
+    module is present, an agent surface that does not bypass the rest.
+  </p>
+
+  <p>
     The direction is close to the old promise of the web: decentralized,
     federated, linkable knowledge that no single product has to own. sempods is
-    inspired by the same values as Solid, but takes its own route: semantic pods,
-    context-based permissions, SPARQL, JSON-LD and MCP as one coherent model.
+    inspired by the same values as Solid, but takes its own route: semantic pods
+    as a coherent stack rather than a private platform API.
   </p>
 
   <p class="action-links">
