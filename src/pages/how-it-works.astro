@@ -29,11 +29,11 @@ import Base from '../layouts/Base.astro';
               one RDF graph`}</pre>
 
   <p>
-    That framing matters. HTTP, RDF, JSON-LD, SPARQL, OAuth/OIDC and MCP are not
-    decorative references around sempods; they are the stack. The specification
-    adds the rules that make them behave as one pod: where identities live, how
-    contexts bind permissions, which queries are visible and how agents reach
-    the same graph without a privileged side door.
+    That framing matters. sempods does not replace HTTP, RDF, JSON-LD, SPARQL,
+    OAuth/OIDC or MCP. It uses them to support one organizing boundary: the
+    context. The specification adds the rules that make a context mean the same
+    thing across resource reads, writes, queries, grants and, when implemented,
+    agent tools.
   </p>
 
   <h2>1. Resources are web addresses</h2>

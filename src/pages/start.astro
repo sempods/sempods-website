@@ -78,7 +78,8 @@ SELECT ?e ?name ?start WHERE {
     should not need a new graph database, a new auth framework or a new query
     engine before it can begin. It needs to make the profiled stack agree on the
     sempods rules: one pod base URL, one context per statement, grants resolved
-    by the server and the same sandbox across HTTP, SPARQL and MCP.
+    by the server, the same sandbox across HTTP and SPARQL, and the same rule for
+    MCP when that optional module is implemented.
   </p>
 
   <p>
