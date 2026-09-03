@@ -21,6 +21,10 @@ updates:
   # The workflow `uses:` pins. A pinned action is a supply-chain dependency like any
   # other and nothing else bumps it — checkout, setup-node and the Pages actions would
   # otherwise drift and silently miss security fixes.
+  #
+  # Major bumps stay ungrouped, for the reason the npm block gives and one more: a major
+  # is where the licence changes and not only the API, and a licence change reads as two
+  # routine lines when it arrives inside a group PR.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -29,3 +33,6 @@ updates:
       github-actions:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
