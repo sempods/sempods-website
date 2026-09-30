@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { assertEvent } from '../lib/public-demo.mjs';
+import { assertEvent, assertEventRow } from '../lib/public-demo.mjs';
 
 const event = 'https://pod.example/events/one';
 
@@ -64,4 +64,61 @@ test('a relative node identifier is resolved against the fetched URI', async () 
     '@context': { '@vocab': 'https://schema.org/' },
     '@id': './one', '@type': 'Event', startDate: '2026-09-30',
   }, event);
+});
+
+const xsd = 'http://www.w3.org/2001/XMLSchema#';
+const row = start => ({ e: { type: 'uri', value: event }, name: { type: 'literal', value: 'An event', 'xml:lang': 'en' }, start });
+const validDates = [
+  { type: 'literal', value: '2026-09-30' },
+  { type: 'literal', value: '2024-02-29', datatype: `${xsd}date` },
+  { type: 'literal', value: '2026-09-30+02:00', datatype: `${xsd}date` },
+  { type: 'literal', value: '2026-09-30T19:30:00Z', datatype: `${xsd}dateTime` },
+  { type: 'literal', value: '2026-09-30T19:30:00.123+02:00', datatype: `${xsd}dateTimeStamp` },
+  { type: 'literal', value: '2026-09-30T19:30:00', datatype: `${xsd}string` },
+  { type: 'literal', value: '2026-09-30T24:00:00.000-14:00', datatype: `${xsd}dateTime` },
+];
+for (const term of validDates) {
+  test(`a literal date ${term.value} is accepted`, () => assertEventRow(row(term)));
+}
+
+const invalidDates = [
+  { type: 'uri', value: 'https://example.org/date' },
+  { type: 'bnode', value: 'date' },
+  { type: 'literal', value: 'sometime soon' },
+  { type: 'literal', value: '2026-02-29' },
+  { type: 'literal', value: '2026-04-31' },
+  { type: 'literal', value: '2026-13-01' },
+  { type: 'literal', value: '2026-09-30T24:01:00Z' },
+  { type: 'literal', value: '2026-09-30T24:00:00.1Z' },
+  { type: 'literal', value: '2026-09-30T19:60:00Z' },
+  { type: 'literal', value: '2026-09-30T19:30:00+14:01' },
+  { type: 'literal', value: '2026-09-30', datatype: `${xsd}integer` },
+  { type: 'literal', value: '2026-09-30', datatype: `${xsd}dateTime` },
+  { type: 'literal', value: '2026-09-30T19:30:00Z', datatype: `${xsd}date` },
+  { type: 'literal', value: '2026-09-30T19:30:00', datatype: `${xsd}dateTimeStamp` },
+];
+for (const term of invalidDates) {
+  test(`an invalid date ${term.type} ${term.value} (${term.datatype ?? 'untyped'}) is rejected`, () => {
+    assert.throws(() => assertEventRow(row(term)), /Event start is a literal calendar date/);
+  });
+}
+
+for (const term of [{ type: 'uri', value: 'https://example.org/name' }, { type: 'bnode', value: 'name' }, { type: 'literal', value: '  ' }]) {
+  test(`an invalid name ${term.type} is rejected`, () => {
+    assert.throws(() => assertEventRow({ ...row(validDates[0]), name: term }), /Event name is a nonempty literal/);
+  });
+}
+
+test('a resource-valued startDate cannot stand in for a date literal', async () => {
+  await assert.rejects(assertEvent({
+    '@id': event, '@type': 'https://schema.org/Event',
+    'https://schema.org/startDate': { '@id': 'https://example.org/date' },
+  }, event), /startDate literal calendar date/);
+});
+
+test('an invalid startDate literal in the fetched RDF is rejected', async () => {
+  await assert.rejects(assertEvent({
+    '@id': event, '@type': 'https://schema.org/Event',
+    'https://schema.org/startDate': 'sometime soon',
+  }, event), /startDate literal calendar date/);
 });

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { assertEvent } from './lib/public-demo.mjs';
+import { assertEvent, assertEventRow } from './lib/public-demo.mjs';
 import { publicPod, publicQuery } from '../src/data/public-query.ts';
 
 const query = await fetch(`${publicPod}/_system/sparql/query`, {
@@ -14,8 +14,7 @@ const results = await query.json();
 assert.deepEqual(results.head.vars, ['e', 'name', 'start'], 'Projected variables');
 assert.equal(results.results.bindings.length, 3, 'The website demonstrates three events');
 for (const row of results.results.bindings) {
-  assert.equal(row.e.type, 'uri', 'Event address is a URI');
-  assert.ok(row.name.value && row.start.value, 'Event name and date are present');
+  assertEventRow(row);
 }
 assert.equal(new Set(results.results.bindings.map(row => row.e.value)).size, 3,
   'The website demonstrates three distinct events');

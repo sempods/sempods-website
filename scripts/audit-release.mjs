@@ -4,6 +4,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const website = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const publicDataFiles = new Set(['src/data/release.json', 'src/data/client-examples.json', 'src/data/site.json']);
 const usage = 'Usage: node scripts/audit-release.mjs --kotlin PATH --spec PATH --release TAG [--previous REF] [--spec-ref REF]';
 
 function git(root, ...args) {
@@ -80,10 +81,11 @@ try {
   const changedPaths = previous
     ? git(kotlin, 'diff', '--name-only', previous, implementation.commit).split('\n').filter(Boolean) : null;
   const websiteFiles = [join(website, 'AGENTS.md'), ...['src', 'public'].flatMap(dir => files(join(website, dir)))];
-  const inventory = websiteFiles.filter(path => /\.(?:astro|ts|css|svg|txt|md)$/.test(path)).map(path => {
+  const inventory = websiteFiles.filter(path => /\.(?:astro|ts|css|svg|txt|md)$/.test(path) || publicDataFiles.has(relative(website, path))).map(path => {
     const source = readFileSync(path, 'utf8');
     return {
       file: relative(website, path),
+      ...(publicDataFiles.has(relative(website, path)) ? { data: JSON.parse(source) } : {}),
       headings: matches(source, /<h[1-3]\b[^>]*>([\s\S]*?)<\/h[1-3]>/g),
       metadata: matches(source, /\b(?:title|description|aria-label|alt)="([^"]*)"/g),
       links: matches(source, /\b(?:href|src)="([^"]+)"/g),

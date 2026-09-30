@@ -120,7 +120,12 @@ do not create data, clients or accounts to validate a public demo. Record time a
 three projected rows have distinct event URIs, and reads one URI to verify that the
 matching RDF node is an Event with a start date. It
 expands the returned JSON-LD before testing RDF terms, so compacted terms and aliases are
-accepted. It requires public network access and does not identify the deployed release. A
+accepted. Names must be nonempty literals. Query dates and the fetched node's start date
+must be literal calendar dates or date-times with valid calendar, time and timezone
+components. Plain and `xsd:string` literals are accepted by lexical form; `xsd:date`,
+`xsd:dateTime` and `xsd:dateTimeStamp` must match their date/time shape, with a timezone
+required for `dateTimeStamp` ([XSD datatypes](https://www.w3.org/TR/xmlschema11-2/)).
+It requires public network access and does not identify the deployed release. A
 temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
 
 Release links use immutable revisions. Explicit “latest development” links may follow `main`.
@@ -161,7 +166,11 @@ npm run audit:release -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempod
 ```
 
 It prints JSON for source identities, changed paths, page surfaces, review candidates and literal
-links into both source repositories. It performs no network checks or edits and does not decide
+links into both source repositories. The inventory includes parsed `data` for the public
+`release.json`, `client-examples.json` and `site.json` sources, preserving the website's
+recorded revisions, example provenance and canonical URL separately from the requested
+release. Other JSON files are excluded; add new public metadata sources explicitly to
+the helper's allowlist. It performs no network checks or edits and does not decide
 claim validity. Compare its output with the previous assessment; it cannot infer an unrecorded
 baseline or validate dynamic links, prose, anchors or code. Read all pages, including those without
 matches. Save generated evidence outside published pages and label it as a revision-specific report.
@@ -179,7 +188,9 @@ npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempo
 
 The Python standard-library helper checks local links, page anchors and asset URLs, including
 stylesheets, scripts, icons, preloads, media sources and image candidates in `srcset`. It includes
-links rendered from JavaScript helpers. Relative URLs without a scheme resolve against the current
+URL-valued Open Graph and Twitter metadata; text, dimensions and descriptions are not
+treated as URLs. Empty social URLs fail. It includes links rendered from JavaScript
+helpers. Relative URLs without a scheme resolve against the current
 page URL. Absolute and scheme-relative URLs at the canonical site origin are checked
 locally as well; Astro and the checker share `src/data/site.json`. `--site` can select
 a different origin for fixtures. Other origins, including concrete pods on the apex,

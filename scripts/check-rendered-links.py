@@ -26,6 +26,13 @@ site_origin = origin(args.site)
 if site_origin[0] not in ('http', 'https') or not site_origin[1]:
     parser.error('--site must be an absolute HTTP(S) URL.')
 
+social_url_fields = {
+    'og:url', 'og:image', 'og:image:url', 'og:image:secure_url',
+    'og:video', 'og:video:url', 'og:video:secure_url',
+    'og:audio', 'og:audio:url', 'og:audio:secure_url',
+    'twitter:image', 'twitter:image:src', 'twitter:player', 'twitter:player:stream',
+}
+
 def srcset_urls(value):
     position = 0
     whitespace = ' \t\n\r\f'
@@ -75,6 +82,14 @@ class Page(HTMLParser):
         for attribute in url_attributes.get(tag, ()):
             if attribute in attributes:
                 self.links.append(attributes[attribute])
+        if tag == 'meta':
+            field = (attributes.get('property') or attributes.get('name') or '').lower()
+            if field in social_url_fields:
+                content = (attributes.get('content') or '').strip()
+                if content:
+                    self.links.append(content)
+                else:
+                    errors.append(f'{self.path.relative_to(root)}: empty social URL {field}')
         candidate_attribute = 'imagesrcset' if tag == 'link' else 'srcset'
         if tag in ('img', 'source', 'link') and candidate_attribute in attributes:
             self.links.extend(srcset_urls(attributes[candidate_attribute]))

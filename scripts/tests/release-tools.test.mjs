@@ -137,7 +137,7 @@ test('missing relative targets and anchors fail the rendered check', t => {
   assert.match(result.stdout, /missing target ..\/images\/missing.svg/);
 });
 
-function demoCheck(t, eventIds) {
+function demoCheck(t, eventIds, amend = () => {}) {
   const directory = fixture(t);
   const results = {
     head: { vars: ['e', 'name', 'start'] },
@@ -148,6 +148,7 @@ function demoCheck(t, eventIds) {
     })) },
   };
   const event = { '@id': eventIds[0], '@type': 'https://schema.org/Event', 'https://schema.org/startDate': '2026-09-30' };
+  amend(results.results.bindings);
   write(directory, 'fetch-fixture.mjs', `
 let requests = 0;
 globalThis.fetch = async () => {
@@ -170,6 +171,85 @@ test('three distinct events pass the full demo check', t => {
   const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`));
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).rows, 3);
+});
+
+test('the full demo rejects a resource IRI projected as an event name', t => {
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`), rows => {
+    rows[0].name = { type: 'uri', value: 'https://pod.example/name' };
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Event name is a nonempty literal/);
+});
+
+for (const field of ['og:image', 'twitter:image', 'og:image:secure_url', 'twitter:player']) {
+  test(`a missing ${field} target fails the rendered check`, t => {
+    const directory = fixture(t);
+    write(directory, 'index.html', `<h1>Home</h1><meta ${field.startsWith('og:') ? 'property' : 'name'}="${field}" content="https://www.sempods.org/missing.png">`);
+    const result = renderedCheck(directory);
+    assert.equal(result.status, 1, result.stdout);
+    assert.match(result.stdout, /missing target https:\/\/www.sempods.org\/missing.png/);
+  });
+}
+
+test('URL-valued social metadata is checked without interpreting text fields as URLs', t => {
+  const directory = fixture(t);
+  write(directory, 'images/preview.png', 'fixture');
+  write(directory, 'index.html', `<h1>Home</h1>
+<meta property="og:url" content="https://www.sempods.org/">
+<meta property="og:image" content="https://www.sempods.org/images/preview.png">
+<meta name="twitter:image" content="/images/preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:alt" content="A social preview">
+<meta name="description" content="Something to read">
+<meta property="og:video" content="https://external.example/video.mp4">`);
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /3 internal links/);
+});
+
+test('an empty social URL fails the rendered check', t => {
+  const directory = fixture(t);
+  write(directory, 'index.html', '<h1>Home</h1><meta property="og:image" content=" ">');
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /empty social URL og:image/);
+});
+
+test('the release inventory reports recorded public JSON sources and excludes other JSON', t => {
+  const directory = fixture(t);
+  const website = join(directory, 'website');
+  const kotlin = join(directory, 'kotlin');
+  const spec = join(directory, 'spec');
+  const release = { implementation: { version: '0.1.0', tag: 'v0.1.0', commit: 'recorded-implementation' }, specification: { commit: 'recorded-specification' } };
+  const examples = { source: { commit: 'recorded-example', path: 'Example.kt', sha256: 'recorded-hash', regions: ['install'] }, compilerVersion: '2.4.20', snippets: { install: 'public example' } };
+  const site = { url: 'https://www.sempods.org' };
+  write(website, 'AGENTS.md', '# Fixture\n');
+  for (const [name, data] of Object.entries({ 'release.json': release, 'client-examples.json': examples, 'site.json': site, 'credentials.json': { secret: 'must not be inventoried' } })) {
+    write(website, `src/data/${name}`, JSON.stringify(data));
+  }
+  write(website, 'public/credentials.json', '{"secret":"also excluded"}');
+  write(kotlin, 'gradle.properties', 'version=0.2.0\nspecVersion=0.1-dev\n');
+  write(spec, 'requirements.json', '{"versions":{"core":"0.1-dev"}}');
+  for (const repository of [website, kotlin, spec]) {
+    const git = (...args) => execFileSync('git', ['-c', 'core.fsmonitor=false', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', repository, ...args], { encoding: 'utf8', timeout: 10000 });
+    git('init', '-q');
+    git('add', '.');
+    git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-qm', 'Create fixture');
+    if (repository === kotlin) git('tag', 'v0.2.0');
+  }
+  mkdirSync(join(website, 'scripts'), { recursive: true });
+  copyFileSync(join(root, 'scripts/audit-release.mjs'), join(website, 'scripts/audit-release.mjs'));
+  const result = spawnSync(process.execPath, [join(website, 'scripts/audit-release.mjs'), '--kotlin', kotlin, '--spec', spec, '--release', 'v0.2.0'], { encoding: 'utf8', timeout: 10000 });
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  const inventory = new Map(report.inventory.map(entry => [entry.file, entry]));
+  assert.deepEqual(inventory.get('src/data/release.json')?.data, release);
+  assert.deepEqual(inventory.get('src/data/client-examples.json')?.data, examples);
+  assert.deepEqual(inventory.get('src/data/site.json')?.data, site);
+  assert.equal(report.implementation.version, '0.2.0');
+  assert.equal(inventory.get('src/data/release.json').reviewCandidates.some(candidate => candidate.kind === 'version' && candidate.text === '0.1.0'), true);
+  assert.equal(inventory.has('src/data/credentials.json'), false);
+  assert.equal(inventory.has('public/credentials.json'), false);
 });
 
 const missingAssets = [
