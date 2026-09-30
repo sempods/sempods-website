@@ -67,17 +67,22 @@ Two rules in that prompt are chatbot rules and do **not** apply here:
   belongs.
 - *"No single core, six innovations together."* Right for a chat that must not be
   talked out of its position; fatal for a website, where six equal concepts are no
-  concept. The site explains exactly one — **contexts** — and hangs the rest off it.
+  concept. Choose one organizing idea from the current vision and verified contract,
+  and let the other concepts explain it. Revisit that choice when the model changes.
 
 ## Structure
 
 Show what is visible, explain what is not. A curl can demonstrate semantic structure,
-linked data and decentralisation — it cannot show permissions, which is why contexts
-is the one explained concept.
+linked data and decentralisation. Explain the authorization boundary separately,
+distinguishing the current contract, one implementation and proposed direction.
 
 The home page leads with a working, unauthenticated query against a live pod. That
 placement is deliberate and should survive edits: it proves the claim in ten seconds
 where a paragraph only asserts it.
+
+For release updates and changes in direction, follow
+[`docs/agents/release-website.md`](docs/agents/release-website.md). It covers source
+selection, the full content review, examples, editorial flow and verification.
 
 ## Language
 

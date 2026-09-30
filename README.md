@@ -11,6 +11,15 @@ npm run dev      # http://localhost:4321
 npm run build    # astro build, then pagefind over dist/
 ```
 
+For a release assessment or website update, follow the
+[release procedure](docs/agents/release-website.md). `npm run audit:release -- --help`
+shows the local inventory command. The inventory collects review evidence; it does not
+validate examples or public services.
+
+The [0.2.0 assessment](docs/reviews/0.2.0.md) records the first review and its evidence.
+The Codex [release skill](skills/sempods-website-release/SKILL.md) is versioned here;
+the personal installation in `~/.codex/skills/sempods-website-release` is a copy.
+
 ## Why Pages and explicit pod URLs
 
 Netlify manages an apex domain and its `www` as a pair: it cannot serve
