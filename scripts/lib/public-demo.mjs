@@ -2,6 +2,33 @@ import assert from 'node:assert/strict';
 import jsonld from 'jsonld';
 
 const xsd = 'http://www.w3.org/2001/XMLSchema#';
+const langString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+const schemaContext = 'https://schema.org/docs/jsonldcontext.jsonld';
+const contextUrls = new Map([
+  ['https://schema.org/', schemaContext],
+  [schemaContext, schemaContext],
+  ['http://schema.org/', schemaContext],
+  ['http://schema.org/docs/jsonldcontext.jsonld', schemaContext],
+]);
+
+function isEventName(term) {
+  if (term?.type !== 'literal' || typeof term.value !== 'string' || !term.value.trim()) return false;
+  if (Object.hasOwn(term, 'xml:lang')) {
+    return typeof term['xml:lang'] === 'string' && Boolean(term['xml:lang'].trim()) &&
+      (term.datatype === undefined || term.datatype === langString);
+  }
+  return term.datatype === undefined || term.datatype === `${xsd}string`;
+}
+
+export function assertPublicEventUrl(event, pod) {
+  const url = new URL(event);
+  const base = new URL(pod);
+  const decoded = new URL(decodeURIComponent(url.pathname), url.origin);
+  assert.ok(url.protocol === 'https:' && url.origin === base.origin &&
+    decoded.origin === base.origin && decoded.pathname.startsWith(`${base.pathname.replace(/\/$/, '')}/`) &&
+    !url.username && !url.password,
+  'Event read stays within the configured public pod');
+}
 
 function isEventDate(term) {
   if (term?.type !== 'literal' || typeof term.value !== 'string' || Object.hasOwn(term, 'xml:lang')) return false;
@@ -34,13 +61,23 @@ function isEventDate(term) {
 export function assertEventRow(row) {
   assert.equal(row.e.type, 'uri', 'Event address is a URI');
   assert.ok(typeof row.e.value === 'string' && row.e.value.trim(), 'Event address is present');
-  assert.ok(row.name?.type === 'literal' && typeof row.name.value === 'string' && row.name.value.trim(),
-    'Event name is a nonempty literal');
+  assert.ok(isEventName(row.name), 'Event name is a nonempty literal with a string-compatible datatype');
   assert.ok(isEventDate(row.start), 'Event start is a literal calendar date or date-time');
 }
 
-export async function assertEvent(representation, base) {
-  const flattened = await jsonld.flatten(representation, null, { base });
+export async function assertEvent(representation, base, { request = fetch, timeoutMs = 20000 } = {}) {
+  const signal = AbortSignal.timeout(timeoutMs);
+  const documentLoader = async url => {
+    const destination = contextUrls.get(new URL(url).href);
+    assert.ok(destination, `Remote JSON-LD context is not allowed: ${url}`);
+    const response = await request(destination, {
+      headers: { Accept: 'application/ld+json, application/json' },
+      redirect: 'error', signal,
+    });
+    assert.equal(response.status, 200, 'Remote context status');
+    return { contextUrl: null, documentUrl: destination, document: await response.json() };
+  };
+  const flattened = await jsonld.flatten(representation, null, { base, documentLoader });
   function nodes(value) {
     if (!value || typeof value !== 'object') return [];
     return [value, ...Object.values(value).flatMap(nodes)];

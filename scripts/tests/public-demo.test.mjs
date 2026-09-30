@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { assertEvent, assertEventRow } from '../lib/public-demo.mjs';
+import { assertEvent, assertEventRow, assertPublicEventUrl } from '../lib/public-demo.mjs';
 
 const event = 'https://pod.example/events/one';
 
@@ -159,4 +159,117 @@ test('type and date in separate descriptions of the same RDF node are accepted',
     { '@id': event, '@type': ['https://schema.org/Event'] },
     { '@id': event, 'https://schema.org/startDate': [{ '@value': '2026-09-30', '@type': `${xsd}date` }] },
   ], event);
+});
+
+for (const datatype of [`${xsd}integer`, `${xsd}boolean`, `${xsd}date`, 'https://example.org/custom']) {
+  test(`a non-text name datatype ${datatype} is rejected`, () => {
+    assert.throws(() => assertEventRow({ ...row(validDates[0]), name: { type: 'literal', value: '42', datatype } }), /Event name is a nonempty literal/);
+  });
+}
+
+for (const name of [
+  { type: 'literal', value: '42' },
+  { type: 'literal', value: 'A venue', datatype: `${xsd}string` },
+  { type: 'literal', value: 'Eine Veranstaltung', 'xml:lang': 'de' },
+  { type: 'literal', value: 'An event', 'xml:lang': 'en', datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' },
+]) {
+  test(`a text-compatible name ${JSON.stringify(name)} is accepted`, () => {
+    assertEventRow({ ...row(validDates[0]), name });
+  });
+}
+
+test('a langString name needs a language and cannot use a numeric datatype', () => {
+  for (const name of [
+    { type: 'literal', value: 'An event', datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' },
+    { type: 'literal', value: 'An event', 'xml:lang': '', datatype: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' },
+    { type: 'literal', value: '42', 'xml:lang': 'en', datatype: `${xsd}integer` },
+  ]) assert.throws(() => assertEventRow({ ...row(validDates[0]), name }), /Event name is a nonempty literal/);
+});
+
+const schemaContext = 'https://schema.org/docs/jsonldcontext.jsonld';
+const remoteRepresentation = context => ({
+  '@context': context, '@id': event, '@type': 'https://schema.org/Event',
+  'https://schema.org/startDate': { '@value': '2026-09-30', '@type': `${xsd}date` },
+});
+const contextResponse = () => new Response(JSON.stringify({ '@context': { '@vocab': 'https://schema.org/' } }), { headers: { 'Content-Type': 'application/ld+json' } });
+
+for (const context of ['http://127.0.0.1/context', 'http://localhost/context', 'https://untrusted.example/context', 'https://schema.org.untrusted.example/context', 'file:///private/context.json', 'data:application/ld+json,{}', 'https://schema.org:444/docs/jsonldcontext.jsonld', 'https://user:pass@schema.org/docs/jsonldcontext.jsonld', 'https://schema.org/docs/jsonldcontext.jsonld?next=http://localhost']) {
+  test(`a context destination is rejected before network access: ${context}`, async () => {
+    let requests = 0;
+    await assert.rejects(assertEvent(remoteRepresentation(context), event, {
+      request: async () => { requests++; return contextResponse(); },
+    }));
+    assert.equal(requests, 0);
+  });
+}
+
+for (const context of ['https://schema.org', 'https://schema.org/', schemaContext, 'http://schema.org', 'http://schema.org/', 'http://schema.org/docs/jsonldcontext.jsonld', 'https://SCHEMA.ORG:443']) {
+  test(`an allowlisted context uses HTTPS, no redirects and a deadline: ${context}`, async () => {
+    let requests = 0;
+    await assertEvent(remoteRepresentation(context), event, {
+      request: async (url, options) => {
+        requests++;
+        assert.equal(url, schemaContext);
+        assert.equal(options.redirect, 'error');
+        assert.ok(options.signal instanceof AbortSignal);
+        return contextResponse();
+      },
+    });
+    assert.equal(requests, 1);
+  });
+}
+
+test('a remote context redirect is rejected without following its Location', async () => {
+  let requests = 0;
+  await assert.rejects(assertEvent(remoteRepresentation(schemaContext), event, {
+    request: async () => {
+      requests++;
+      return new Response('', { status: 302, headers: { Location: 'http://127.0.0.1/private' } });
+    },
+  }));
+  assert.equal(requests, 1);
+});
+
+test('an allowed context cannot import a private-network context', async () => {
+  let requests = 0;
+  await assert.rejects(assertEvent(remoteRepresentation(schemaContext), event, {
+    request: async () => {
+      requests++;
+      return new Response(JSON.stringify({ '@context': 'http://127.0.0.1/private' }));
+    },
+  }));
+  assert.equal(requests, 1);
+});
+
+test('remote context requests share one deadline per verification', async () => {
+  const signals = [];
+  await assertEvent(remoteRepresentation(['https://schema.org', 'https://schema.org/']), event, {
+    request: async (_, options) => { signals.push(options.signal); return contextResponse(); },
+  });
+  assert.equal(signals.length, 2);
+  assert.equal(signals[0], signals[1]);
+});
+
+test('an unavailable remote context aborts instead of hanging verification', async () => {
+  let signal;
+  await assert.rejects(assertEvent(remoteRepresentation(schemaContext), event, {
+    timeoutMs: 25,
+    request: async (_, options) => {
+      signal = options.signal;
+      if (signal.aborted) throw signal.reason;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve(contextResponse()), 1000);
+        signal.addEventListener('abort', () => { clearTimeout(timer); reject(signal.reason); }, { once: true });
+      });
+    },
+  }));
+  assert.equal(signal.aborted, true);
+});
+
+test('the selected event read is restricted to the configured HTTPS pod', () => {
+  const pod = 'https://sempods.org/aaltra';
+  assertPublicEventUrl(`${pod}/events/one`, pod);
+  for (const url of ['http://127.0.0.1/private', 'https://elsewhere.example/event', 'https://sempods.org/aaltra-copy/event', 'https://sempods.org/another-pod/event', 'https://user:pass@sempods.org/aaltra/event', 'http://sempods.org/aaltra/event', 'https://sempods.org/aaltra/%2e%2e%2fprivate']) {
+    assert.throws(() => assertPublicEventUrl(url, pod), /Event read stays within the configured public pod/);
+  }
 });

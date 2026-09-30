@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
+import { publicPod } from '../../src/data/public-query.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 function fixture(t) {
@@ -57,6 +58,61 @@ test('extraction rejects a stale version even when the tag and commit agree', t 
 function renderedCheck(directory, extraArgs = []) {
   return spawnSync('python3', [join(root, 'scripts/check-rendered-links.py'), '--dist', directory, '--kotlin', directory, '--spec', directory, ...extraArgs], { encoding: 'utf8' });
 }
+
+for (const href of ['/%2e%2e/outside.txt', 'https://www.sempods.org/%2E%2E/outside.txt', '/images/%2e%2e%2f%2e%2e/outside.txt']) {
+  test(`a decoded path outside the build is rejected: ${href}`, t => {
+    const directory = fixture(t);
+    const dist = join(directory, 'dist');
+    write(directory, 'outside.txt', 'Not in the published artifact');
+    write(dist, 'index.html', `<h1>Home</h1><a href="${href}">Outside</a>`);
+    mkdirSync(join(dist, 'images'));
+    const result = renderedCheck(dist);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /outside build root/);
+  });
+}
+
+for (const kind of ['asset', 'directory index', 'HTML page']) {
+  test(`a ${kind} symlink outside the build is rejected`, t => {
+    const directory = fixture(t);
+    const dist = join(directory, 'dist');
+    write(directory, 'outside.txt', '<h1>Outside the artifact</h1>');
+    write(dist, 'index.html', '<h1>Home</h1><a href="/linked">Linked</a>');
+    if (kind === 'directory index') {
+      mkdirSync(join(dist, 'linked'));
+      symlinkSync(join(directory, 'outside.txt'), join(dist, 'linked/index.html'));
+    } else {
+      const name = kind === 'HTML page' ? 'linked.html' : 'linked';
+      symlinkSync(join(directory, 'outside.txt'), join(dist, name));
+      write(dist, 'index.html', `<h1>Home</h1><a href="/${name}">Linked</a>`);
+    }
+    const result = renderedCheck(dist);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /outside build root/);
+  });
+}
+
+test('decoded dot segments and symlinks within the build remain valid', t => {
+  const directory = fixture(t);
+  write(directory, 'start/index.html', '<h1 id="build">Build</h1>');
+  write(directory, 'images/real.svg', '<svg></svg>');
+  symlinkSync(join(directory, 'images/real.svg'), join(directory, 'images/alias.svg'));
+  write(directory, 'index.html', '<h1>Home</h1><a href="/images/%2e%2e/start#build">Start</a><img src="/images/alias.svg">');
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /2 internal links/);
+});
+
+test('relative links in an internal HTML symlink resolve from its rendered URL', t => {
+  const directory = fixture(t);
+  write(directory, 'real/index.html', '<h1>Real page</h1><a href="guide">Guide</a>');
+  write(directory, 'real/guide/index.html', '<h1>Guide</h1>');
+  mkdirSync(join(directory, 'alias'));
+  symlinkSync(join(directory, 'real/index.html'), join(directory, 'alias/index.html'));
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /alias\/index.html: missing target guide/);
+});
 
 test('absolute and scheme-relative same-origin links include canonical URLs and assets', t => {
   const directory = fixture(t);
@@ -161,20 +217,20 @@ globalThis.fetch = async () => {
 }
 
 test('three bindings for the same event do not prove three events', t => {
-  const event = 'https://pod.example/events/one';
+  const event = `${publicPod}/events/one`;
   const result = demoCheck(t, [event, event, event]);
   assert.notEqual(result.status, 0, result.stdout);
   assert.match(result.stderr, /The website demonstrates three distinct events/);
 });
 
 test('three distinct events pass the full demo check', t => {
-  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`));
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `${publicPod}/events/${id}`));
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).rows, 3);
 });
 
 test('the full demo rejects a resource IRI projected as an event name', t => {
-  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`), rows => {
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `${publicPod}/events/${id}`), rows => {
     rows[0].name = { type: 'uri', value: 'https://pod.example/name' };
   });
   assert.notEqual(result.status, 0);
@@ -182,11 +238,25 @@ test('the full demo rejects a resource IRI projected as an event name', t => {
 });
 
 test('the full demo rejects a language-tagged date binding', t => {
-  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`), rows => {
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `${publicPod}/events/${id}`), rows => {
     rows[0].start = { type: 'literal', value: '2026-09-30', 'xml:lang': 'en' };
   });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Event start is a literal calendar date/);
+});
+
+test('the full demo rejects a numeric name datatype', t => {
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `${publicPod}/events/${id}`), rows => {
+    rows[0].name = { type: 'literal', value: '42', datatype: 'http://www.w3.org/2001/XMLSchema#integer' };
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /string-compatible datatype/);
+});
+
+test('the full demo never reads a selected private-network event URI', t => {
+  const result = demoCheck(t, ['http://127.0.0.1/private', `${publicPod}/events/two`, `${publicPod}/events/three`]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Event read stays within the configured public pod/);
 });
 
 for (const [name, markup] of [

@@ -123,9 +123,18 @@ class Page(HTMLParser):
             self.last = data
             self.boundary = False
 
-pages = {path: Page(path) for path in root.rglob('*.html') if 'pagefind' not in path.parts}
+pages = {}
+for path in root.rglob('*.html'):
+    if 'pagefind' in path.parts:
+        continue
+    resolved = path.resolve()
+    if not resolved.is_relative_to(root):
+        errors.append(f'{path.relative_to(root)}: HTML file outside build root')
+        continue
+    pages[path] = Page(path)
 if not pages:
     parser.error('No built HTML found; run npm run build first.')
+html_targets = {path.resolve(): page for path, page in pages.items()}
 source_links = set()
 internal = 0
 repositories = {'sempods-kotlin': args.kotlin, 'sempods-spec': args.spec}
@@ -137,12 +146,18 @@ for file, page in pages.items():
         resolved = urljoin(args.site.rstrip('/') + page_path, href)
         parsed = urlparse(resolved)
         if origin(resolved) == site_origin:
-            target = root / unquote(parsed.path).lstrip('/')
+            target = (root / unquote(parsed.path).lstrip('/')).resolve()
+            if not target.is_relative_to(root):
+                errors.append(f'{file.relative_to(root)}: target outside build root {href}')
+                continue
             if target.is_dir() or not target.exists() and not target.suffix:
-                target /= 'index.html'
+                target = (target / 'index.html').resolve()
+            if not target.is_relative_to(root):
+                errors.append(f'{file.relative_to(root)}: target outside build root {href}')
+                continue
             if not target.exists():
                 errors.append(f'{file.relative_to(root)}: missing target {href}')
-            elif parsed.fragment and target in pages and unquote(parsed.fragment) not in pages[target].ids:
+            elif parsed.fragment and target in html_targets and unquote(parsed.fragment) not in html_targets[target].ids:
                 errors.append(f'{file.relative_to(root)}: missing anchor {href}')
             internal += 1
         match = re.fullmatch(r'https://github.com/sempods/(sempods-kotlin|sempods-spec)/blob/([^/]+)/([^#]+)(?:#(.*))?', href)

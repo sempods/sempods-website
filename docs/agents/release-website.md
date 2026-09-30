@@ -120,7 +120,9 @@ do not create data, clients or accounts to validate a public demo. Record time a
 three projected rows have distinct event URIs, and reads one URI to verify that the
 matching RDF node is an Event with a start date. It
 expands the returned JSON-LD before testing RDF terms, so compacted terms and aliases are
-accepted. Names must be nonempty literals. Query dates and the fetched node's start date
+accepted. Names must be nonempty plain, language-tagged or `xsd:string` literals.
+A language-tagged name may declare `rdf:langString`; other datatypes are rejected.
+Query dates and the fetched node's start date
 must be literal calendar dates or date-times with valid calendar, time and timezone
 components. Plain and `xsd:string` literals are accepted by lexical form; `xsd:date`,
 `xsd:dateTime` and `xsd:dateTimeStamp` must match their date/time shape, with a timezone
@@ -128,6 +130,13 @@ required for `dateTimeStamp` ([XSD datatypes](https://www.w3.org/TR/xmlschema11-
 Dates must have no language tag; language-tagged names are allowed. JSON-LD is
 expanded and flattened, so repeated descriptions of the same node are combined
 before testing its type and date.
+The selected Event read must stay under the configured HTTPS pod URL; query and
+resource requests reject redirects. Remote contexts are restricted to the Schema.org
+root URL and `/docs/jsonldcontext.jsonld`, using the standard HTTP/HTTPS aliases.
+All aliases fetch the fixed HTTPS context document without redirects. Context
+requests share a 20-second network deadline per representation. Other destinations,
+including contexts imported by an allowed document, fail before network access;
+additional context providers require an explicit reviewed allowlist change.
 It requires public network access and does not identify the deployed release. A
 temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
 
@@ -195,6 +204,9 @@ URL-valued Open Graph and Twitter metadata; text, dimensions and descriptions ar
 treated as URLs. Empty asset and social URLs fail, including whitespace-only or
 valueless attributes and empty image candidate lists. Empty navigation links remain
 valid self-links; absent optional URLs and inline scripts are allowed.
+Decoded targets and symlinks must resolve within the build directory, including
+directory index files. HTML files outside that root are not read. Relative URLs
+retain the rendered page's path when an internal HTML symlink is encountered.
 It includes links rendered from JavaScript
 helpers. Relative URLs without a scheme resolve against the current
 page URL. Absolute and scheme-relative URLs at the canonical site origin are checked
@@ -218,6 +230,8 @@ Check absent, empty, malformed and valid inputs, and alternative representations
 the same value. Pair a rejected case with its nearest valid alternative: an empty
 asset URL with a navigation self-link, or a language-tagged date with a typed date
 under a default-language context. Check identities, datatypes and qualifiers together.
+For a helper that touches files or the network, also check decoded path containment,
+symlinks, destination selection, redirects and the timeout of every secondary fetch.
 
 Run the offline regressions for the whole helper and the relevant source or live
 checks. Distinguish newly introduced regressions from older gaps and deliberate

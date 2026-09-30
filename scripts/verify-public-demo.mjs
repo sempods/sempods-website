@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { assertEvent, assertEventRow } from './lib/public-demo.mjs';
+import { assertEvent, assertEventRow, assertPublicEventUrl } from './lib/public-demo.mjs';
 import { publicPod, publicQuery } from '../src/data/public-query.ts';
 
 const query = await fetch(`${publicPod}/_system/sparql/query`, {
@@ -7,6 +7,7 @@ const query = await fetch(`${publicPod}/_system/sparql/query`, {
   headers: { 'Content-Type': 'application/sparql-query', Accept: 'application/sparql-results+json' },
   body: publicQuery,
   signal: AbortSignal.timeout(20000),
+  redirect: 'error',
 });
 assert.equal(query.status, 200, 'Public query status');
 assert.match(query.headers.get('content-type') ?? '', /application\/sparql-results\+json/, 'Public query media type');
@@ -19,9 +20,11 @@ for (const row of results.results.bindings) {
 assert.equal(new Set(results.results.bindings.map(row => row.e.value)).size, 3,
   'The website demonstrates three distinct events');
 const event = results.results.bindings[0].e.value;
+assertPublicEventUrl(event, publicPod);
 const resource = await fetch(event, {
   headers: { Accept: 'application/ld+json' },
   signal: AbortSignal.timeout(20000),
+  redirect: 'error',
 });
 assert.equal(resource.status, 200, 'Event read status');
 assert.match(resource.headers.get('content-type') ?? '', /application\/ld\+json/, 'Event media type');
