@@ -14,7 +14,10 @@ npm run build    # astro build, then pagefind over dist/
 For a release assessment or website update, follow the
 [release procedure](docs/agents/release-website.md). `npm run audit:release -- --help`
 shows the local inventory command. The inventory collects review evidence; it does not
-validate examples or public services.
+validate examples or public services. After a fresh build,
+`npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempods-spec`
+checks rendered local/source links and inline word boundaries. It requires Python 3.
+`npm run demo:verify` checks the anonymous public query and a returned event with network access.
 
 The [0.2.0 assessment](docs/reviews/0.2.0.md) records the first review and its evidence.
 The Codex [release skill](skills/sempods-website-release/SKILL.md) is versioned here;

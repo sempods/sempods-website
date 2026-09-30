@@ -9,7 +9,9 @@
     "check": "astro check",
     "audit:release": "node scripts/audit-release.mjs",
     "examples:sync": "node scripts/sync-examples.mjs",
-    "examples:verify": "node scripts/verify-published-example.mjs"
+    "examples:verify": "node scripts/verify-published-example.mjs",
+    "check:rendered": "python3 scripts/check-rendered-links.py",
+    "demo:verify": "node scripts/verify-public-demo.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

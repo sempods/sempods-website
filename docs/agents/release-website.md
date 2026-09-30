@@ -98,6 +98,13 @@ that source API; separately verify a minimal consumer against the published arti
 claiming the published quickstart works. If that consumer or extraction does not exist, report
 the gap and link the verified guide instead of claiming a pipeline exists.
 
+For an implemented update, record the selected sources in `src/data/release.json`.
+Keep the implementation version, tag and full commit consistent; select the specification commit
+and core/module versions separately. Run the [example pipeline](example-pipeline.md): extraction
+from the selected tag, `--check`, then the independent published-artifact consumer. Update the
+manifest and extraction together. Neither a successful old fixture nor a fresh source extraction
+alone verifies a newly selected publication.
+
 Check BOM version, artifact availability, optional adapters, language/API names and per-module
 runtime requirements. Separate build JDK from runtime JDK and bytecode target. Installation text
 names prerequisites, configuration defaults, credentials, expected results and its intended use.
@@ -109,8 +116,9 @@ For each live example, run the exact anonymous query and check status, media typ
 variables and the data the prose claims. Follow a returned resource IRI and check the representation.
 A SELECT result does not necessarily contain the RDF predicates used in its query. Distinguish
 “demonstrates a contract” from “proves interoperability across implementations”. Use public reads;
-do not create data, clients or accounts to validate a public demo. Record time and outcome. A
-temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
+do not create data, clients or accounts to validate a public demo. Record time and outcome. `npm run demo:verify` runs the exact shared query, checks the
+three projected event rows, and reads a returned URI to verify an Event with a start date. It
+requires public network access and does not identify the deployed release. A temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
 
 Release links use immutable revisions. Explicit “latest development” links may follow `main`.
 Container tags and source labels do not prove a digest, a deployment version or an upgrade path.
@@ -132,6 +140,9 @@ direction changes. Read the whole affected page and its incoming/outgoing journe
   Keep vision motivating and visibly distinct from something the visitor can use today.
 - Remove the sentence or section the new material replaces. Brief repetition can orient readers;
   copied status lists and competing explanations create drift.
+- Inspect rendered word boundaries around inline links and code. Astro may discard newline
+  whitespace; use explicit spaces where required. Separate adjacent action links textually as
+  well as visually, so search indexes complete words.
 
 Read the headings alone, then the page aloud, then follow the calls to action as a new visitor.
 Ask whether the reader can explain the idea and take the next step without visiting release notes.
@@ -156,8 +167,20 @@ An assessment ends with the source record, redesign decision, page matrix, featu
 example/setup gaps, proposed editorial brief and remaining uncertainty. Keep it distinct from a
 maintained roadmap. Public implementation work follows the repositories' issue/PR conventions.
 
-When applying an update, run `npm run check` and `npm run build`, verify internal routes and
-anchors in generated HTML, and inspect desktop and narrow-screen rendering of changed journeys.
+When applying an update, run `npm run check` and `npm run build`, then check generated output:
+
+```bash
+npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempods-spec
+```
+
+The Python standard-library helper checks local links, images and anchors, including links
+rendered from JavaScript helpers. It checks GitHub source paths and heading anchors against the
+revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
+check covers ordinary headings; inspect custom rendering when it reports uncertainty. It does
+not check remote availability, arbitrary external links or editorial truth. A new build is required
+before each run; existing `dist/` may describe older source.
+
+Inspect desktop and narrow-screen rendering of changed journeys.
 Check code wrapping, diagrams, keyboard navigation, search, metadata and the early demo. Run the
 tests owning changed examples and, where required, the published-artifact consumer. Record actual
 results and bounded failures; a successful Astro build proves neither API accuracy nor good prose.
@@ -171,6 +194,8 @@ own source identity and must not silently change the implementation pin.
 
 Store the reviewed source commits and example provenance with the resulting change, so the next
 run has a baseline. The agent can prepare a patch and PR when requested. Publication is a separate
-requested action through the existing deployment workflow. No scheduled job is installed by this
-procedure; release-event delivery, runner access and example extraction need implementation and
-verification before calling it unattended automation.
+requested action through the existing deployment workflow. The source inventory, release
+manifest, example extraction, published consumer, public-demo check and rendered link checks
+are available locally. No scheduled job is installed by this procedure. Release-event
+delivery, runner access and idempotent review/PR updates still need implementation and verification
+before calling it unattended automation.
