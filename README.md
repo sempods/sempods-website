@@ -45,11 +45,17 @@ than being typed here.
 
 ## State
 
-Every page carries real copy; none of them are skeletons. What the site still owes
-is a compiled source for code examples — every snippet should come from something
-that builds, and none does yet. The reasoning behind the structure is recorded in
-`docs/website.md` in the planning repo, and what is still open is workstream B of
-`docs/roadmaps/go-live.md` beside it.
+The website is reviewed against Kotlin 0.2.0 and an independently pinned specification
+revision in `src/data/release.json`. The [update report](docs/reviews/0.2.0-update.md)
+records the editorial decisions and verification.
+
+Client snippets are extracted from the tagged implementation's documentation tests.
+The [example pipeline](docs/agents/example-pipeline.md) checks that extraction and runs
+the displayed dependencies and snippets against Maven Central on Java 21. The public
+SPARQL query has one source shared by the home and start pages.
+
+The structure's original reasoning remains in `docs/website.md` in the private planning
+repo. Reassess its outstanding work against the current release procedure and report.
 
 ## Licensing
 

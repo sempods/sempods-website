@@ -1,17 +1,15 @@
-/*
- * The published coordinates, in one place.
- *
- * This is a stopgap and should be read as one. AGENTS.md says code examples come
- * from a compiled source, because `0.x` may break the public API and a snippet
- * that no longer compiles is worse than none. That source does not exist yet:
- * the plan is an `examples/quickstart` module in sempods-kotlin that builds
- * against the published artifacts, with the site pulling its text at build time.
- *
- * Until it does, keeping the version in exactly one file is the difference
- * between one place to forget and several. Do not inline these strings into a
- * page.
- */
-export const SEMPODS_VERSION = '0.1.0';
+import release from './release.json' with { type: 'json' };
 
-export const gradleDependencies = `implementation(platform("org.sempods:sempods-bom:${SEMPODS_VERSION}"))
-implementation("org.sempods:sempods-client")`;
+export const SEMPODS_VERSION = release.implementation.version;
+export const SEMPODS_RELEASE_URL = `https://github.com/sempods/sempods-kotlin/releases/tag/${release.implementation.tag}`;
+
+export const implementationDoc = (path: string) =>
+  `https://github.com/sempods/sempods-kotlin/blob/${release.implementation.tag}/${path}`;
+
+export const specificationDoc = (path: string) =>
+  `https://github.com/sempods/sempods-spec/blob/${release.specification.commit}/${path}`;
+
+export const gradleDependencies = `dependencies {
+  implementation(platform("org.sempods:sempods-bom:${SEMPODS_VERSION}"))
+  implementation("org.sempods:sempods-client")
+}`;

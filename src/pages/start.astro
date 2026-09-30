@@ -1,249 +1,138 @@
 ---
 import Base from '../layouts/Base.astro';
-import { gradleDependencies, SEMPODS_VERSION } from '../data/coordinates';
-
-const readQuery = `curl -X POST https://sempods.org/aaltra/_system/sparql/query \\
-  -H "Content-Type: application/sparql-query" \\
-  -H "Accept: application/sparql-results+json" \\
-  --data 'PREFIX schema: <https://schema.org/>
-SELECT ?e ?name ?start WHERE {
-  ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
-} ORDER BY ?start LIMIT 3'`;
+import examples from '../data/client-examples.json';
+import { publicCurl } from '../data/public-query';
+import { gradleDependencies, SEMPODS_VERSION, SEMPODS_RELEASE_URL, implementationDoc, specificationDoc } from '../data/coordinates';
+const sourceUrl = implementationDoc(examples.source.path);
 ---
 
 <Base
-  title="Start with sempods — query a pod, read the specification, run your own"
-  description="Start with sempods by querying a live public pod, reading the specification, running your own pod, or building against the published JVM artifacts."
+  title="Start with sempods — build a client, implement the contract or run a pod"
+  description="Query a public pod, use the Kotlin 0.2 JVM client, implement the open contract, or run the development composition. Choose the path that fits your task."
   schemaType="TechArticle"
 >
   <p class="eyebrow">try it yourself</p>
-  <h1>Start with the part that is real today</h1>
-
+  <h1>Start with a real pod. Then choose your path.</h1>
   <p class="lede">
-    Run the query in step 1. It takes ten seconds, needs nothing installed, and
-    it is the fastest thing here that proves something instead of asserting it.
+    Read three events from a public pod. No account or installation needed.
+    Then build a client, read the contract, or run a pod yourself.
   </p>
 
-  <p>
-    After that the ladder forks by what brought you here, and the rungs are not
-    equally polished. If you want to know whether the model holds up, step 3 is
-    the specification and the rest is optional. If you want to build something,
-    step 7 is the artifacts. If you want a pod of your own, step 4 is the fast
-    way and step 5 is the honest one.
-  </p>
-
-  <section class="try-block">
-    <h2>1. Query a live public pod</h2>
-
+  <section id="query" class="try-block">
+    <h2>Query and follow the data</h2>
+    <pre><code>{publicCurl}</code></pre>
     <p>
-      Public contexts are readable without authentication. This query reads a
-      real venue's event calendar from its own pod:
-    </p>
-
-    <pre><code>{readQuery}</code></pre>
-
-    <p class="evidence">
-      The endpoint is ordinary HTTP. The query is ordinary SPARQL. The result is
-      JSON from live linked data, not a special website API.
+      The response contains <code>e</code>, <code>name</code> and <code>start</code>.
+      Open one of the event URIs in <code>e</code> to read its JSON-LD description.
+      The venue keeps the data; your client can use it.
     </p>
   </section>
-
-  <h2>2. Follow the data</h2>
-
-  <p>
-    The query returns event URIs. Open one and the pod returns the resource
-    itself with the statements you are allowed to see. That is the Linked Data
-    part: the identifier is also the address.
-  </p>
-
-  <p>
-    This is the smallest useful proof of decentralization. The venue owns the
-    event graph. Apps and websites can use it without becoming the place where
-    the data lives.
-  </p>
-
-  <h2>3. Read the specification</h2>
-
-  <p>
-    Two steps of live data prove that one server behaves a certain way. The{' '}
-    <a href="https://spec.sempods.org">specification</a> is the claim that this is
-    a contract rather than one server's habits: core chapters for contexts,
-    grants, authorization, CRUD, SPARQL and <code>find</code>, optional modules
-    beside them, and every normative statement carrying an identifier so it can
-    be cited instead of paraphrased.
-  </p>
-
-  <p>
-    The contract is intentionally built from known standards. A new implementation
-    should not need a new graph database, a new auth framework or a new query
-    engine before it can begin. It needs to make the profiled stack agree on the
-    sempods rules: one pod base URL, one context per statement, grants resolved
-    by the server, the same sandbox across HTTP and SPARQL, and the same rule for
-    MCP when that optional module is implemented.
-  </p>
-
-  <p>
-    The <a href="https://spec.sempods.org/api/">HTTP surface</a> is the same
-    thing with a request button: the OpenAPI descriptions rendered as a client.
-  </p>
-
-  <p>
-    It is <em>descriptive</em> until <code>0.1</code> is tagged — it is being
-    extracted from the reference implementation, and where the two disagree the
-    implementation is right. Read it as an accurate description of something that
-    runs, not yet as a promise it will not move.
-  </p>
-
   <p class="action-links">
-    <a href="https://spec.sempods.org">Read the specification</a>
-    <a href="https://spec.sempods.org/api/">Open the HTTP surface</a>
+    <a href="#build">Build an app</a>{' '}
+    <a href="#implement">Implement the contract</a>{' '}
+    <a href="#run">Run a pod</a>
   </p>
 
-  <h2>4. Ask for a hosted test pod</h2>
-
+  <h2 id="build">Build against a pod</h2>
   <p>
-    Concrete pods can already live under sempods.org paths such as{' '}
-    <code>https://sempods.org/aaltra</code>. A pod base URL is an address, not a
-    page: nothing is served at the root of it today, so the shortest readable
-    proof that a pod is there is its{' '}
-    <a href="https://sempods.org/aaltra/_system/contexts">context list</a>, which
-    an anonymous caller sees as exactly one public context. There is no public
-    hosting entry UI yet; new pods for early ideas or tests are created manually
-    on request.
+    Use HTTP and JSON-LD directly, or start with the JVM client. The{' '}<a href={SEMPODS_RELEASE_URL}>Kotlin {SEMPODS_VERSION} release</a> is on Maven Central.
+    Select one BOM version for the modules you use:
   </p>
-
-  <p>
-    That is the fastest path when you want a real pod without operating the
-    infrastructure yourself: backups, updates and migrations across version or
-    schema changes are handled on the hosted side. For a test pod, write to{' '}
-    <a href="mailto:danilo@sempods.org">danilo@sempods.org</a>.
-  </p>
-
-  <h2>5. Run your own pod</h2>
-
-  <p>
-    The stronger decentralization proof is self-hosting. In{' '}
-    <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>, the
-    local deployment brings up a pod and the services behind it, so you can test
-    against infrastructure you run yourself.
-  </p>
-
-  <p>
-    This path is rougher than asking for a hosted test pod, but it matters. It
-    proves sempods is not one hosted service with a public API; the hosted path
-    is only the fastest way to begin.
-  </p>
-
-  <p class="action-links">
-    <a href="https://github.com/sempods/sempods-kotlin/tree/main/deployments/local">Open local deployment</a>
-  </p>
-
-  <h2>6. Read or run the reference implementation</h2>
-
-  <p>
-    <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is the
-    reference implementation. It contains the working server and client stack:
-    Linked Data CRUD, contexts, grants, SPARQL sandboxing and a pod MCP endpoint
-    at <code>/_system/mcp</code>.
-  </p>
-
-  <p>
-    The aaltra pod exposes that MCP path too, so the same live data can be tested
-    through HTTP, SPARQL or MCP without changing the ownership model.
-  </p>
-
-  <p>
-    It is not meant to be the only implementation — it is the one the{' '}
-    <a href="https://spec.sempods.org">specification</a> was extracted from, which
-    is a different claim. A second implementation would be written against the
-    text; this one is what the text currently describes.
-  </p>
-
-  <h2>7. Build against the JVM artifacts</h2>
-
-  <p>
-    The artifacts are on Maven Central. Until a compiled quickstart example is
-    pulled into the website, the coordinates live in one place here:
-  </p>
-
   <pre><code>{gradleDependencies}</code></pre>
+  <ul>
+    <li><code>sempods-client</code>: HTTP, JSON-LD text, bytes, SPARQL results and OAuth helpers; Java 21+.</li>
+    <li><code>sempods-client-rdf4j</code>: RDF4J models and values; Java 25+.</li>
+    <li><code>sempods-client-media</code>: binary media operations; Java 21+.</li>
+    <li><code>sempods-control-plane-client</code>: host administration; Java 21+.</li>
+  </ul>
 
+  <h3>Read a public resource</h3>
   <p>
-    Version {SEMPODS_VERSION}, Java 21 bytecode. <code>SempodsPodClient</code>{' '}
-    covers reading, writing, contexts and SPARQL.
+    Set <code>podUrl</code> to the full pod URL and <code>resourceIri</code> to
+    a resource in that pod. The snippets use <code>org.sempods.client.*</code>{' '}and <code>okhttp3.OkHttpClient</code>. Install the client policy once:
+  </p>
+  <pre><code>{examples.snippets.install}</code></pre>
+  <p>Bind a session and read the resource. Check the status before using the body:</p>
+  <pre><code>{examples.snippets.publicRead}</code></pre>
+  <p class="evidence">
+    These snippets come from the <a href={sourceUrl}>tested release source</a>.
+    The complete test supplies the imports and a local HTTP fixture.
+  </p>
+  <p>
+    For private data, choose <a href={implementationDoc('sempods-server/docs/auth/user-access.md')}>delegated access</a>{' '}when acting for a person, or <a href={implementationDoc('sempods-server/docs/auth/service-clients.md')}>service access</a>{' '}for a backend acting as itself. Service registration and owner consent are
+    experimental Kotlin 0.2 extensions.
+  </p>
+  <p>
+    Coming from 0.1? The client API changed, and RDF4J and media moved into
+    separate adapters. Read the <a href={implementationDoc('docs/migration/0.2.md')}>migration guide</a>{' '}before raising the BOM.
+  </p>
+  <p class="action-links">
+    <a href={implementationDoc('sempods-client/README.md')}>JVM client guide</a>{' '}
+    <a href="/concepts/mcp-over-pods">Connect an agent</a>
   </p>
 
-  <h2>8. Try the preview apps</h2>
-
+  <h2 id="implement">Implement the open contract</h2>
   <p>
-    <a href="https://apps.sempods.org">apps.sempods.org</a>{' '}is an early
-    collection of apps that connect to a pod by URL. Explorer visualizes the
-    graph and is the one worth opening first. Focus, a todo app, and Konsum, a
-    shopping list, are experimental enough that they are not linked directly from
-    here.
+    The <a href="https://spec.sempods.org">development specification</a> defines
+    the public contract: authorized RDF access, HTTP CRUD, SPARQL and retrieval,
+    with optional modules such as MCP and media. It can be implemented in a
+    different language or on a different store.
+  </p>
+  <p>
+    Choose a complete specification revision. Core and modules version
+    independently of each other and of Kotlin. A <code>0.1-dev</code> label
+    needs its source commit to identify what you implemented.
+  </p>
+  <p>
+    The normative text already determines the contract. Proposals describe
+    possible changes; they do not change the requirements. A product conformance
+    suite remains unfinished, so document known deviations.
+  </p>
+  <p class="action-links">
+    <a href="https://spec.sempods.org/api/">Explore the HTTP surface</a>{' '}
+    <a href={specificationDoc('docs/guides/specification-revisions.md')}>Select a revision</a>{' '}
+    <a href={specificationDoc('GOVERNANCE.md')}>Read governance</a>
   </p>
 
+  <h2 id="run">Compose or run a pod</h2>
   <p>
-    The surface is still rough, but the architecture is the important part here:
-    these apps work against pods through the SDK that is being prepared for
-    public release.
+    sempods-kotlin supplies reusable services and libraries. A deployment chooses
+    their implementations and configuration. Start with the release's{' '}<a href={implementationDoc('README.md#quick-start')}>local quick start</a>{' '}to run the development composition with Java 25 and Docker Compose.
+  </p>
+  <p>
+    That composition supports development and evaluation. A concrete deployment
+    owns backups, version transitions and recovery; the supplied stack has no
+    supported upgrade path. Read <a href={implementationDoc('docs/concepts/modularity.md#deployment-and-upgrades')}>deployment responsibilities</a>{' '}before using it for persistent data.
+  </p>
+  <p>
+    AI routes are disabled unless a provider is configured. Media and identity
+    also depend on your chosen composition. The release guides explain the
+    settings rather than assuming every service is needed.
+  </p>
+  <p class="action-links">
+    <a href={implementationDoc('README.md#the-three-services')}>Choose services</a>{' '}
+    <a href={implementationDoc('docs/concepts/modularity.md')}>Explore the building blocks</a>
   </p>
 
+  <h2 id="explore">Explore before operating anything</h2>
+  <p>
+    <a href="https://apps.sempods.org/explorer/">Explorer</a> is an experimental
+    graph browser. Point it at a public pod to see resources and links together.
+    A preview app's availability is separate from the Kotlin release.
+  </p>
   <figure class="media-breakout">
-    <a
-      href="/images/explorer-aaltra.webp"
-      target="_blank"
-      rel="noopener"
-      aria-label="Open larger Explorer screenshot"
-    >
-      <img
-        src="/images/explorer-aaltra.webp"
-        width="1600"
-        height="1005"
-        loading="lazy"
-        decoding="async"
-        alt="Explorer app visualizing an aaltra event from a sempods pod as a graph"
-      />
+    <a href="/images/explorer-aaltra.webp" target="_blank" rel="noopener" aria-label="Open larger Explorer screenshot">
+      <img src="/images/explorer-aaltra.webp" width="1600" height="1005" loading="lazy" decoding="async"
+        alt="Explorer displaying a linked event graph from the aaltra pod" />
     </a>
-    <figcaption>
-      Explorer reads the aaltra pod as a graph: event, description, dates, image
-      data and schema.org terms stay connected. The image opens larger for
-      reading labels and edges.
-    </figcaption>
+    <figcaption>One event, its dates and its links, read from the aaltra pod.</figcaption>
   </figure>
-
-  <p class="action-links app-links">
-    <a href="https://apps.sempods.org/explorer/">Open Explorer</a>
-    <a href="https://apps.sempods.org">See preview apps</a>
-  </p>
-
-  <h2>What is not here yet</h2>
-
   <p>
-    The public TypeScript SDK is the next important surface for app builders.
-    Once it is open, this page should shift from "read the reference
-    implementation" toward "build a small app against a pod". It is the one rung
-    of the ladder that is missing rather than rough.
+    Need a test pod or a starting point for your own setup?{' '}<a href="mailto:hello@sempods.org">Write to hello@sempods.org</a>.
+    Hosting is arranged manually; there is no public hosting dashboard.
   </p>
-
-  <p>
-    SHACL shapes and a TBox model may become part of that later: apps and agents
-    should eventually be able to discover the shapes and meaning they can work
-    with, not rely only on prose and convention.
-  </p>
-
-  <hr class="divider" />
-
-  <p>
-    Something does not behave as written?
-    <a href="https://github.com/sempods/sempods-kotlin/issues">Open an issue</a>.
-    A first-run problem is one of the most useful reports a project at this
-    stage can receive.
-  </p>
-
-  <p>
-    Looking for something this page does not cover — the repositories, the
-    vocabulary, the published artifacts, where to ask a question?{' '}
-    <a href="/links">Everything sempods is, on one page</a>.
+  <p class="action-links">
+    <a href="/links">Find project resources</a>{' '}
+    <a href="https://github.com/sempods/sempods-kotlin/issues">Report an implementation problem</a>
   </p>
 </Base>

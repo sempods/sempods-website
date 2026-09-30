@@ -1,118 +1,66 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { implementationDoc, specificationDoc } from '../../data/coordinates';
 ---
 
 <Base
-  title="Federated grants in sempods"
-  description="How sempods uses WebID-style identities, app DIDs, aliases and grants so apps and agents can work with pod data without becoming the central account system."
+  title="Identity and grants in sempods"
+  description="How person identities, app identities and service credentials support delegated and service access, with grants resolved by the pod."
   schemaType="TechArticle"
 >
   <p class="eyebrow">concepts · identity</p>
-  <h1>Federation starts with names that can leave the app</h1>
-
+  <h1>Identity can travel. Authority stays with the pod.</h1>
   <p class="lede">
-    A pod is only useful as an open data space if identities are not trapped in
-    the product that happens to read it first. sempods treats people, apps and
-    pods as addressable things.
+    A useful open data space needs to recognize who is acting without making
+    each app the owner of the person's identity. It also needs to distinguish
+    an app acting for a person from a service acting as itself.
   </p>
-
+  <h2>People have addressable identities</h2>
   <p>
-    The current reference implementation stores person permissions against
-    WebID-style URIs. A user may sign in through an OIDC bridge today, but the
-    grant is not written to "the Google account" or "the app account". It is
-    written to an identifier the pod can reason about.
+    The current contract identifies a person through a WebID URI. A pod can
+    attach grants to that identity. An optional OIDC bridge lets the person
+    sign in through an upstream provider.
   </p>
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="A person grants an app access to selected pod contexts">{`person WebID
-     |
-     | user-level grant
-     v
-pod contexts
-     ^
-     | delegated grant at consent
-     |
- app DID`}</pre>
-
-  <h2>WebID and aliases</h2>
-
   <p>
-    WebID gives a person a stable URI. sempods also carries aliases, such as a
-    deterministic local URN or linked identity URIs, so a grant can still match
-    when the same person is known through more than one address.
+    The Kotlin identity service provides WebID profiles and that bridge.
+    Trusted providers can assert equivalent WebID identities through the
+    specified claim. The pod validates the assertion; similar-looking names
+    do not establish that two identities belong to the same person.
   </p>
-
+  <h2>Apps can act for a person</h2>
   <p>
-    That matters for decentralization. A pod should not need one global account
-    provider in order to grant access before someone signs in, move between
-    identity providers, or federate with another deployment.
+    Delegated access uses Authorization Code with PKCE. The token identifies
+    the person and client; the pod resolves the app's granted reach. An app
+    receives the delegation the person approves within their own authority.
   </p>
-
-  <h2>App DID</h2>
-
-  <p>
-    Apps are identified too. In the current model, pod-issued access tokens name
-    the app through <code>client_id</code>, typically a DID-style identifier. The
-    token also names the person as <code>sub</code>.
-  </p>
-
-  <p>
-    This is the pair the pod cares about: which person authorized which app. The
-    app does not become the owner of the data; it receives the delegated reach
-    the user consented to.
-  </p>
-
   <div class="proof">
-    <h3>Two levels, one decision point</h3>
+    <h3>A calendar can stay a calendar</h3>
     <p>
-      The reference implementation separates user-level grants from app
-      delegation. At consent, the app receives the intersection of what it asks
-      for and what the user may grant.
-    </p>
-    <p class="evidence">
-      A broader user grant does not automatically mean every app receives that
-      breadth.
+      A person may read events and private notes. They can let a calendar app
+      read the event Context without sharing the notes. The app does not
+      automatically receive everything its user can access.
     </p>
   </div>
-
-  <h2>Linked Open Data still has public edges</h2>
-
+  <h2>Services can act as themselves</h2>
   <p>
-    Public pod contexts remain readable without login. That is not a shortcut
-    around authorization; it is the public part of Linked Open Data. A website,
-    crawler, app or agent can dereference public resources and follow links.
+    A backend or scheduled worker uses Client Credentials. Its service identity
+    and grants determine access; a person need not be online for every operation.
   </p>
-
   <p>
-    Authenticated grants add private depth. The same resource can have public
-    statements in one context and private statements in another. Federation does
-    not require flattening those layers into one shared account system.
+    Kotlin 0.2 adds experimental registration, owner consent and management for
+    these services. The owner can choose their reach, narrow it or revoke it.
+    Those setup extensions are described in the release's service-access guide.
   </p>
-
-  <h2>What is still moving</h2>
-
+  <h2>Public data is still public</h2>
   <p>
-    The vocabulary around aliases, WebID documents, app DID profiles and grant
-    UX will continue to mature with the specification. The direction is already
-    clear enough: identity should be linkable, grants should be revocable, and
-    apps should be replaceable.
+    An anonymous caller can read public Contexts. Authenticated access can add
+    private depth to the same resource. Each pod applies its own decisions;
+    linking data does not establish a shared account or grant access elsewhere.
   </p>
-
-  <h2>Where the contract is written</h2>
-
-  <p>
-    The part that has settled is in the specification.{' '}
-    <a href="https://spec.sempods.org/spec/core/auth/">Authorization and client
-    identity</a> is core: a pod knows a person as a WebID URI, and names the app
-    through its <code>client_id</code>. Arriving through an upstream provider is
-    the optional <a href="https://spec.sempods.org/spec/modules/oidc/">OIDC bridge
-    module</a> — which is the sharper version of the point above, because a pod
-    that identifies people some other way is conformant without it.
-  </p>
-
   <p class="action-links">
-    <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/mcp-over-pods">Next: MCP over pods</a>
-    <a href="https://spec.sempods.org/spec/core/auth/">Read the auth chapter</a>
-    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/auth/identity.md">Implementation notes</a>
+    <a href={specificationDoc('spec/core/auth.md')}>Authorization contract</a>{' '}
+    <a href={implementationDoc('sempods-server/docs/auth/identity.md')}>Identity and trust</a>{' '}
+    <a href={implementationDoc('sempods-server/docs/auth/service-clients.md')}>Service access</a>{' '}
+    <a href="/concepts/mcp-over-pods">Explore MCP</a>
   </p>
 </Base>

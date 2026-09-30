@@ -7,7 +7,9 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
-    "audit:release": "node scripts/audit-release.mjs"
+    "audit:release": "node scripts/audit-release.mjs",
+    "examples:sync": "node scripts/sync-examples.mjs",
+    "examples:verify": "node scripts/verify-published-example.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
