@@ -33,6 +33,20 @@ response status, exact body and absence of an Authorization header. The generate
 fixture directory is printed for inspection. It does not use project substitution,
 a live write or real credentials.
 
+The server is stopped even if client installation fails; client resources are closed
+after a successful installation. Verify the initialization failure path with the
+published dependencies:
+
+```bash
+JAVA_HOME=/path/to/jdk-25 SEMPODS_TEST_GRADLE=/path/to/gradlew \
+  node --test scripts/integration-tests/published-example.test.mjs
+```
+
+This test injects a throwing installation in a disposable copy and requires the
+consumer JVM to exit with that failure. It uses a two-minute deadline and terminates
+the fixture process group if cleanup regresses. The website's recorded snippets are
+unchanged.
+
 This verifies the displayed core-client read, not optional adapters, deployment setup
 or all release behavior. Live-query and editorial checks belong to the
 [release procedure](release-website.md).

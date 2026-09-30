@@ -47,17 +47,20 @@ fun main() {
   server.start()
   val podUrl = "http://127.0.0.1:\${server.address.port}/alice"
   val resourceIri = "$podUrl/events/summer-party"
-  ${example.snippets.install}
   try {
-    ${example.snippets.publicRead.replaceAll('\n', '\n    ')}
-    check(result.status == 200)
-    check(result.body == body)
-    check(authorization == null) { "Public example sent an Authorization header" }
-    println("Published client example passed on Java \${Runtime.version().feature()}.")
+    ${example.snippets.install}
+    try {
+      ${example.snippets.publicRead.replaceAll('\n', '\n      ')}
+      check(result.status == 200)
+      check(result.body == body)
+      check(authorization == null) { "Public example sent an Authorization header" }
+      println("Published client example passed on Java \${Runtime.version().feature()}.")
+    } finally {
+      http.dispatcher.executorService.shutdown()
+      http.connectionPool.evictAll()
+    }
   } finally {
     server.stop(0)
-    http.dispatcher.executorService.shutdown()
-    http.connectionPool.evictAll()
   }
 }
 `);

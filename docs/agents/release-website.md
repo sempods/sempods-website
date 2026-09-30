@@ -180,7 +180,10 @@ npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempo
 The Python standard-library helper checks local links, page anchors and asset URLs, including
 stylesheets, scripts, icons, preloads, media sources and image candidates in `srcset`. It includes
 links rendered from JavaScript helpers. Relative URLs without a scheme resolve against the current
-page URL. It checks GitHub source paths and heading anchors against the revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
+page URL. Absolute and scheme-relative URLs at the canonical site origin are checked
+locally as well; Astro and the checker share `src/data/site.json`. `--site` can select
+a different origin for fixtures. Other origins, including concrete pods on the apex,
+remain external. It checks GitHub source paths and heading anchors against the revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
 check covers ordinary headings; inspect custom rendering when it reports uncertainty. It does
 not check remote availability, arbitrary external links or editorial truth. A new build is required
 before each run; existing `dist/` may describe older source.

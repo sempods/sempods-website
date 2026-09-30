@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check built links and inline word boundaries against selected local sources."""
 import argparse
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -11,9 +12,19 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--dist', default='dist')
 parser.add_argument('--kotlin', required=True)
 parser.add_argument('--spec', required=True)
+parser.add_argument('--site', default=json.loads((Path(__file__).resolve().parent.parent / 'src/data/site.json').read_text())['url'])
 args = parser.parse_args()
 root = Path(args.dist).resolve()
 errors = []
+
+def origin(url):
+    parsed = urlparse(url)
+    port = parsed.port if parsed.port is not None else {'https': 443, 'http': 80}.get(parsed.scheme.lower())
+    return parsed.scheme.lower(), parsed.hostname, port
+
+site_origin = origin(args.site)
+if site_origin[0] not in ('http', 'https') or not site_origin[1]:
+    parser.error('--site must be an absolute HTTP(S) URL.')
 
 def srcset_urls(value):
     position = 0
@@ -97,14 +108,13 @@ internal = 0
 repositories = {'sempods-kotlin': args.kotlin, 'sempods-spec': args.spec}
 for file, page in pages.items():
     for href in page.links:
-        parsed = urlparse(href)
-        if not parsed.scheme and not parsed.netloc:
-            page_path = '/' + file.relative_to(root).as_posix()
-            if page_path.endswith('/index.html'):
-                page_path = page_path[:-len('index.html')]
-            local = urlparse(urljoin(page_path, href))
-            target = root / unquote(local.path).lstrip('/')
-            parsed = local
+        page_path = '/' + file.relative_to(root).as_posix()
+        if page_path.endswith('/index.html'):
+            page_path = page_path[:-len('index.html')]
+        resolved = urljoin(args.site.rstrip('/') + page_path, href)
+        parsed = urlparse(resolved)
+        if origin(resolved) == site_origin:
+            target = root / unquote(parsed.path).lstrip('/')
             if target.is_dir() or not target.exists() and not target.suffix:
                 target /= 'index.html'
             if not target.exists():

@@ -1,12 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import site from './src/data/site.json' with { type: 'json' };
 
 // The canonical site URL stays on www for GitHub Pages output. The apex can
 // also show the website, while concrete pod URLs may live below it, such as
 // https://sempods.org/aaltra.
 export default defineConfig({
-  site: 'https://www.sempods.org',
+  site: site.url,
   integrations: [sitemap()],
 
   // No language prefix on the default locale: /use-cases/events, never

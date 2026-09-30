@@ -54,9 +54,54 @@ test('extraction rejects a stale version even when the tag and commit agree', t 
   assert.equal(JSON.parse(readFileSync(join(website, 'src/data/client-examples.json'))).source.commit, commit);
 });
 
-function renderedCheck(directory) {
-  return spawnSync('python3', [join(root, 'scripts/check-rendered-links.py'), '--dist', directory, '--kotlin', directory, '--spec', directory], { encoding: 'utf8' });
+function renderedCheck(directory, extraArgs = []) {
+  return spawnSync('python3', [join(root, 'scripts/check-rendered-links.py'), '--dist', directory, '--kotlin', directory, '--spec', directory, ...extraArgs], { encoding: 'utf8' });
 }
+
+test('absolute and scheme-relative same-origin links include canonical URLs and assets', t => {
+  const directory = fixture(t);
+  write(directory, 'start/index.html', '<h1 id="build">Build</h1>');
+  write(directory, 'assets/image 2.svg', '<svg></svg>');
+  write(directory, 'index.html', `<h1>Home</h1>
+<link rel="canonical" href="https://www.sempods.org/">
+<a href="https://www.sempods.org/start?mode=read#build">Start</a>
+<a href="//www.sempods.org/start/#build">Start</a>
+<a href="https://WWW.SEMPODS.ORG:443/start/">Start</a>
+<img src="https://www.sempods.org/assets/image%202.svg?v=1">
+<a href="https://www.sempods.org.example/missing">External</a>
+<a href="https://www.sempods.org:444/missing">External</a>
+<a href="http://www.sempods.org/missing">External</a>
+<a href="https://sempods.org/aaltra">Public pod</a>`);
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /5 internal links/);
+});
+
+test('missing absolute same-origin routes, assets and anchors fail the rendered check', t => {
+  const directory = fixture(t);
+  write(directory, 'start/index.html', '<h1 id="build">Build</h1>');
+  write(directory, 'index.html', `<h1>Home</h1>
+<link rel="canonical" href="https://www.sempods.org/missing">
+<script src="//www.sempods.org/missing.js"></script>
+<a href="https://www.sempods.org/start#missing">Missing anchor</a>`);
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 1, result.stdout);
+  assert.match(result.stdout, /missing target https:\/\/www.sempods.org\/missing/);
+  assert.match(result.stdout, /missing target \/\/www.sempods.org\/missing.js/);
+  assert.match(result.stdout, /missing anchor https:\/\/www.sempods.org\/start#missing/);
+});
+
+test('the configured site origin determines which absolute URLs are internal', t => {
+  const directory = fixture(t);
+  write(directory, 'index.html', `<h1>Home</h1>
+<link rel="canonical" href="https://preview.example:8443/">
+<a href="https://www.sempods.org/missing">External</a>
+<a href="https://preview.example:8443/missing">Internal</a>`);
+  const result = renderedCheck(directory, ['--site', 'https://preview.example:8443']);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /missing target https:\/\/preview.example:8443\/missing/);
+  assert.doesNotMatch(result.stdout, /missing target https:\/\/www.sempods.org/);
+});
 
 test('relative directories, assets, query-only URLs and anchors resolve from the page URL', t => {
   const directory = fixture(t);
