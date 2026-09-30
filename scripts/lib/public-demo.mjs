@@ -4,7 +4,7 @@ import jsonld from 'jsonld';
 const xsd = 'http://www.w3.org/2001/XMLSchema#';
 
 function isEventDate(term) {
-  if (term?.type !== 'literal' || typeof term.value !== 'string') return false;
+  if (term?.type !== 'literal' || typeof term.value !== 'string' || Object.hasOwn(term, 'xml:lang')) return false;
   const date = /^(-?(?:\d{4}|[1-9]\d{4,}))-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.exec(term.value);
   if (!date) return false;
   const [, yearText, monthText, dayText, hourText, minuteText, secondText, fraction, zone] = date;
@@ -40,14 +40,15 @@ export function assertEventRow(row) {
 }
 
 export async function assertEvent(representation, base) {
-  const expanded = await jsonld.expand(representation, { base });
+  const flattened = await jsonld.flatten(representation, null, { base });
   function nodes(value) {
     if (!value || typeof value !== 'object') return [];
     return [value, ...Object.values(value).flatMap(nodes)];
   }
-  const eventNodes = nodes(expanded).filter(node =>
+  const eventNodes = nodes(flattened).filter(node =>
     node['@id'] === base && Array.isArray(node['@type']) && node['@type'].some(type => type === 'https://schema.org/Event'));
   assert.ok(eventNodes.some(node => node['https://schema.org/startDate']?.some(value =>
-    isEventDate({ type: 'literal', value: value['@value'], datatype: value['@type'] }))),
+    isEventDate({ type: 'literal', value: value['@value'], datatype: value['@type'],
+      ...(Object.hasOwn(value, '@language') ? { 'xml:lang': value['@language'] } : {}) }))),
     'An Event has a startDate literal calendar date or date-time in the returned RDF');
 }

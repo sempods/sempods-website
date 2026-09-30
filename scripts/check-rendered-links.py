@@ -81,7 +81,11 @@ class Page(HTMLParser):
         }
         for attribute in url_attributes.get(tag, ()):
             if attribute in attributes:
-                self.links.append(attributes[attribute])
+                url = (attributes[attribute] or '').strip()
+                if not url and tag not in ('a', 'area'):
+                    errors.append(f'{self.path.relative_to(root)}: empty asset URL {tag}[{attribute}]')
+                else:
+                    self.links.append(url)
         if tag == 'meta':
             field = (attributes.get('property') or attributes.get('name') or '').lower()
             if field in social_url_fields:
@@ -92,7 +96,11 @@ class Page(HTMLParser):
                     errors.append(f'{self.path.relative_to(root)}: empty social URL {field}')
         candidate_attribute = 'imagesrcset' if tag == 'link' else 'srcset'
         if tag in ('img', 'source', 'link') and candidate_attribute in attributes:
-            self.links.extend(srcset_urls(attributes[candidate_attribute]))
+            candidates = list(srcset_urls(attributes[candidate_attribute] or ''))
+            if candidates:
+                self.links.extend(candidates)
+            else:
+                errors.append(f'{self.path.relative_to(root)}: empty asset URL {tag}[{candidate_attribute}]')
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'):
             self.last = ''
         if tag in ('a', 'code'):

@@ -122,3 +122,41 @@ test('an invalid startDate literal in the fetched RDF is rejected', async () => 
     'https://schema.org/startDate': 'sometime soon',
   }, event), /startDate literal calendar date/);
 });
+
+test('a language-tagged date binding is rejected while a language-tagged name is accepted', () => {
+  const start = { type: 'literal', value: '2026-09-30', 'xml:lang': 'en' };
+  assert.throws(() => assertEventRow(row(start)), /Event start is a literal calendar date/);
+  assertEventRow(row({ type: 'literal', value: '2026-09-30' }));
+});
+
+test('a language tag cannot be combined with an accepted date datatype', () => {
+  assert.throws(() => assertEventRow(row({ type: 'literal', value: '2026-09-30', datatype: `${xsd}date`, 'xml:lang': 'en' })), /Event start is a literal calendar date/);
+});
+
+test('a language-tagged date in expanded JSON-LD is rejected', async () => {
+  await assert.rejects(assertEvent([{
+    '@id': event, '@type': ['https://schema.org/Event'],
+    'https://schema.org/startDate': [{ '@value': '2026-09-30', '@language': 'en' }],
+  }], event), /startDate literal calendar date/);
+});
+
+test('a context default language cannot turn date text into an accepted date', async () => {
+  await assert.rejects(assertEvent({
+    '@context': { '@vocab': 'https://schema.org/', '@language': 'en' },
+    '@id': event, '@type': 'Event', startDate: '2026-09-30',
+  }, event), /startDate literal calendar date/);
+});
+
+test('an explicit date datatype overrides a context default language', async () => {
+  await assertEvent({
+    '@context': { '@vocab': 'https://schema.org/', '@language': 'en', startDate: { '@id': 'https://schema.org/startDate', '@type': `${xsd}date` } },
+    '@id': event, '@type': 'Event', startDate: '2026-09-30',
+  }, event);
+});
+
+test('type and date in separate descriptions of the same RDF node are accepted', async () => {
+  await assertEvent([
+    { '@id': event, '@type': ['https://schema.org/Event'] },
+    { '@id': event, 'https://schema.org/startDate': [{ '@value': '2026-09-30', '@type': `${xsd}date` }] },
+  ], event);
+});

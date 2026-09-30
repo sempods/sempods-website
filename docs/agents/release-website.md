@@ -125,6 +125,9 @@ must be literal calendar dates or date-times with valid calendar, time and timez
 components. Plain and `xsd:string` literals are accepted by lexical form; `xsd:date`,
 `xsd:dateTime` and `xsd:dateTimeStamp` must match their date/time shape, with a timezone
 required for `dateTimeStamp` ([XSD datatypes](https://www.w3.org/TR/xmlschema11-2/)).
+Dates must have no language tag; language-tagged names are allowed. JSON-LD is
+expanded and flattened, so repeated descriptions of the same node are combined
+before testing its type and date.
 It requires public network access and does not identify the deployed release. A
 temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
 
@@ -189,7 +192,10 @@ npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempo
 The Python standard-library helper checks local links, page anchors and asset URLs, including
 stylesheets, scripts, icons, preloads, media sources and image candidates in `srcset`. It includes
 URL-valued Open Graph and Twitter metadata; text, dimensions and descriptions are not
-treated as URLs. Empty social URLs fail. It includes links rendered from JavaScript
+treated as URLs. Empty asset and social URLs fail, including whitespace-only or
+valueless attributes and empty image candidate lists. Empty navigation links remain
+valid self-links; absent optional URLs and inline scripts are allowed.
+It includes links rendered from JavaScript
 helpers. Relative URLs without a scheme resolve against the current
 page URL. Absolute and scheme-relative URLs at the canonical site origin are checked
 locally as well; Astro and the checker share `src/data/site.json`. `--site` can select
@@ -203,6 +209,25 @@ Inspect desktop and narrow-screen rendering of changed journeys.
 Check code wrapping, diagrams, keyboard navigation, search, metadata and the early demo. Run the
 tests owning changed examples and, where required, the published-artifact consumer. Record actual
 results and bounded failures; a successful Astro build proves neither API accuracy nor good prose.
+
+## Review verification helpers
+
+When a finding changes a verification helper, review that helper's input contract
+before pushing. Identify what a pass proves and what remains outside its scope.
+Check absent, empty, malformed and valid inputs, and alternative representations of
+the same value. Pair a rejected case with its nearest valid alternative: an empty
+asset URL with a navigation self-link, or a language-tagged date with a typed date
+under a default-language context. Check identities, datatypes and qualifiers together.
+
+Run the offline regressions for the whole helper and the relevant source or live
+checks. Distinguish newly introduced regressions from older gaps and deliberate
+validation-policy changes. A green run proves the recorded checks passed; neither
+the tests nor a repeated automated review establish exhaustive correctness.
+
+The PR build runs offline regressions, Astro diagnostics and the website build.
+Source-repository, published-consumer, browser and live-service verification still
+need their corresponding environments and recorded results. The separate `check`
+job verifies DCO sign-offs.
 
 ## Later automation
 

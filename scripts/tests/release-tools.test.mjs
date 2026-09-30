@@ -181,6 +181,44 @@ test('the full demo rejects a resource IRI projected as an event name', t => {
   assert.match(result.stderr, /Event name is a nonempty literal/);
 });
 
+test('the full demo rejects a language-tagged date binding', t => {
+  const result = demoCheck(t, ['one', 'two', 'three'].map(id => `https://pod.example/events/${id}`), rows => {
+    rows[0].start = { type: 'literal', value: '2026-09-30', 'xml:lang': 'en' };
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Event start is a literal calendar date/);
+});
+
+for (const [name, markup] of [
+  ['script', '<script src=""></script>'],
+  ['image', '<img src="">'],
+  ['stylesheet', '<link rel="stylesheet" href="">'],
+  ['media source', '<source src="">'],
+  ['poster', '<video poster=""></video>'],
+  ['valueless attribute', '<img src>'],
+  ['whitespace attribute', '<script src=" \n\t "></script>'],
+  ['srcset', '<img srcset="">'],
+  ['imagesrcset', '<link rel="preload" as="image" imagesrcset=" , , ">'],
+]) {
+  test(`an empty ${name} URL is rejected`, t => {
+    const directory = fixture(t);
+    write(directory, 'index.html', `<h1>Home</h1>${markup}`);
+    const result = renderedCheck(directory);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /empty asset URL/);
+  });
+}
+
+test('self-navigation, inline scripts and absent optional media URLs remain valid', t => {
+  const directory = fixture(t);
+  write(directory, 'index.html', `<h1 id="home">Home</h1>
+<a href="">Current page</a><a href="#home">Home</a>
+<area href=""><script>const inline = true;</script><video></video>`);
+  const result = renderedCheck(directory);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /3 internal links/);
+});
+
 for (const field of ['og:image', 'twitter:image', 'og:image:secure_url', 'twitter:player']) {
   test(`a missing ${field} target fails the rendered check`, t => {
     const directory = fixture(t);
