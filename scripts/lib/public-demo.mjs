@@ -8,7 +8,7 @@ export async function assertEvent(representation, base) {
     return [value, ...Object.values(value).flatMap(nodes)];
   }
   const eventNodes = nodes(expanded).filter(node =>
-    Array.isArray(node['@type']) && node['@type'].some(type => type === 'https://schema.org/Event'));
+    node['@id'] === base && Array.isArray(node['@type']) && node['@type'].some(type => type === 'https://schema.org/Event'));
   assert.ok(eventNodes.some(node => 'https://schema.org/startDate' in node),
     'An Event has a startDate in the returned RDF');
 }

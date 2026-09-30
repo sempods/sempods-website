@@ -117,7 +117,8 @@ variables and the data the prose claims. Follow a returned resource IRI and chec
 A SELECT result does not necessarily contain the RDF predicates used in its query. Distinguish
 “demonstrates a contract” from “proves interoperability across implementations”. Use public reads;
 do not create data, clients or accounts to validate a public demo. Record time and outcome. `npm run demo:verify` runs the exact shared query, checks the
-three projected event rows, and reads a returned URI to verify an Event with a start date. It
+three projected rows have distinct event URIs, and reads one URI to verify that the
+matching RDF node is an Event with a start date. It
 expands the returned JSON-LD before testing RDF terms, so compacted terms and aliases are
 accepted. It requires public network access and does not identify the deployed release. A
 temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
@@ -176,8 +177,9 @@ then check generated output:
 npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempods-spec
 ```
 
-The Python standard-library helper checks local links, images and anchors, including links
-rendered from JavaScript helpers. Relative URLs without a scheme resolve against the current
+The Python standard-library helper checks local links, page anchors and asset URLs, including
+stylesheets, scripts, icons, preloads, media sources and image candidates in `srcset`. It includes
+links rendered from JavaScript helpers. Relative URLs without a scheme resolve against the current
 page URL. It checks GitHub source paths and heading anchors against the revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
 check covers ordinary headings; inspect custom rendering when it reports uncertainty. It does
 not check remote availability, arbitrary external links or editorial truth. A new build is required

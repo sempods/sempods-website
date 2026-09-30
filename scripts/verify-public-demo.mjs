@@ -17,6 +17,8 @@ for (const row of results.results.bindings) {
   assert.equal(row.e.type, 'uri', 'Event address is a URI');
   assert.ok(row.name.value && row.start.value, 'Event name and date are present');
 }
+assert.equal(new Set(results.results.bindings.map(row => row.e.value)).size, 3,
+  'The website demonstrates three distinct events');
 const event = results.results.bindings[0].e.value;
 const resource = await fetch(event, {
   headers: { Accept: 'application/ld+json' },

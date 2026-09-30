@@ -15,6 +15,33 @@ args = parser.parse_args()
 root = Path(args.dist).resolve()
 errors = []
 
+def srcset_urls(value):
+    position = 0
+    whitespace = ' \t\n\r\f'
+    while position < len(value):
+        while position < len(value) and value[position] in whitespace + ',':
+            position += 1
+        start = position
+        while position < len(value) and value[position] not in whitespace:
+            position += 1
+        token = value[start:position]
+        if not token:
+            return
+        yield token.rstrip(',')
+        if token.endswith(','):
+            continue
+        depth = 0
+        while position < len(value):
+            char = value[position]
+            position += 1
+            if char == '(':
+                depth += 1
+            elif char == ')':
+                depth = max(0, depth - 1)
+            elif char == ',' and not depth:
+                break
+
+
 class Page(HTMLParser):
     def __init__(self, path):
         super().__init__()
@@ -28,15 +55,23 @@ class Page(HTMLParser):
         attributes = dict(attributes)
         if 'id' in attributes:
             self.ids.add(attributes['id'])
-        if tag == 'a' and 'href' in attributes:
-            self.links.append(attributes['href'])
-        if tag == 'img' and 'src' in attributes:
-            self.links.append(attributes['src'])
+        url_attributes = {
+            'a': ('href',), 'area': ('href',), 'link': ('href',),
+            'img': ('src',), 'script': ('src',), 'source': ('src',),
+            'audio': ('src',), 'video': ('src', 'poster'), 'track': ('src',),
+            'iframe': ('src',), 'embed': ('src',), 'input': ('src',), 'object': ('data',),
+        }
+        for attribute in url_attributes.get(tag, ()):
+            if attribute in attributes:
+                self.links.append(attributes[attribute])
+        candidate_attribute = 'imagesrcset' if tag == 'link' else 'srcset'
+        if tag in ('img', 'source', 'link') and candidate_attribute in attributes:
+            self.links.extend(srcset_urls(attributes[candidate_attribute]))
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'):
             self.last = ''
         if tag in ('a', 'code'):
             self.boundary = True
-        if tag not in ('img', 'meta', 'link', 'br', 'hr', 'input', 'source', 'wbr'):
+        if tag not in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
             self.stack.append(tag)
 
     def handle_endtag(self, tag):
@@ -74,7 +109,7 @@ for file, page in pages.items():
                 target /= 'index.html'
             if not target.exists():
                 errors.append(f'{file.relative_to(root)}: missing target {href}')
-            elif parsed.fragment and (target not in pages or unquote(parsed.fragment) not in pages[target].ids):
+            elif parsed.fragment and target in pages and unquote(parsed.fragment) not in pages[target].ids:
                 errors.append(f'{file.relative_to(root)}: missing anchor {href}')
             internal += 1
         match = re.fullmatch(r'https://github.com/sempods/(sempods-kotlin|sempods-spec)/blob/([^/]+)/([^#]+)(?:#(.*))?', href)

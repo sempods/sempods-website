@@ -41,3 +41,27 @@ test('unrelated JSON properties are not RDF predicates', async () => {
     '@id': event, '@type': 'Event', startDate: '2026-09-30',
   }, event), /An Event has a startDate/);
 });
+
+test('an unrelated Event cannot stand in for the fetched resource', async () => {
+  await assert.rejects(assertEvent({
+    '@context': { '@vocab': 'https://schema.org/' },
+    '@graph': [
+      { '@id': event, '@type': 'Place', name: 'Venue' },
+      { '@id': 'https://pod.example/events/other', '@type': 'Event', startDate: '2026-09-30' },
+    ],
+  }, event));
+});
+
+test('the fetched Event URI must be present in the representation', async () => {
+  await assert.rejects(assertEvent({
+    '@context': { '@vocab': 'https://schema.org/' },
+    '@id': 'https://pod.example/events/other', '@type': 'Event', startDate: '2026-09-30',
+  }, event));
+});
+
+test('a relative node identifier is resolved against the fetched URI', async () => {
+  await assertEvent({
+    '@context': { '@vocab': 'https://schema.org/' },
+    '@id': './one', '@type': 'Event', startDate: '2026-09-30',
+  }, event);
+});
