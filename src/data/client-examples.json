@@ -1,0 +1,16 @@
+{
+  "source": {
+    "commit": "f4a0941bbc6ea8951c6fbade6d1fa437d3decaf4",
+    "path": "sempods-client/src/test/kotlin/org/sempods/client/DocumentationExamplesTest.kt",
+    "sha256": "15802a9f35e1185b8356581158ee4d0100650ebad0b1d310d883741f87206d17",
+    "regions": [
+      "install",
+      "public-read"
+    ]
+  },
+  "compilerVersion": "2.4.20",
+  "snippets": {
+    "install": "val http = SempodsOkHttp.install(OkHttpClient.Builder()).build()",
+    "publicRead": "val session = SempodsSession(SempodsPodBase.of(podUrl))\nval pod = SempodsPod(session, http)\nval result = pod.resources().getText(resourceIri)\nif (result.status == 200) {\n  val jsonLd = checkNotNull(result.body)\n  println(jsonLd)\n}"
+  }
+}

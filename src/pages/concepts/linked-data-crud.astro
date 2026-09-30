@@ -1,115 +1,66 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { specificationDoc, implementationDoc } from '../../data/coordinates';
 ---
 
 <Base
-  title="Linked Data CRUD in sempods — resources, HTTP and JSON-LD"
-  description="How sempods exposes pod resources through ordinary HTTP and JSON-LD so apps can read and write Linked Data without hiding everything behind one SDK."
+  title="Linked Data CRUD in sempods — resources with their own addresses"
+  description="Read and write JSON-LD resources over HTTP. The current contract separates a resource's URI from its selected write Context."
   schemaType="TechArticle"
 >
-  <p class="eyebrow">concepts · Linked Data CRUD</p>
-  <h1>CRUD is not the exciting part. Owning the URI is.</h1>
-
+  <p class="eyebrow">concepts · HTTP</p>
+  <h1>The resource keeps its address</h1>
   <p class="lede">
-    Linked Data CRUD can sound too ordinary for a new architecture. That is
-    mostly the point. A pod resource should be addressable on the web, readable
-    as data, and writable through well-understood HTTP semantics.
+    An event's URI identifies the event and gives clients a place to read
+    about it. Apps can use ordinary HTTP operations on linked data that
+    exists outside any one SDK.
   </p>
-
+  <h2>Read a resource</h2>
   <p>
-    The value is not that sempods replaces HTTP, RDF stores or JSON tooling. It
-    keeps those parts ordinary so the new contract can stay narrow: which URI is
-    the resource, which context receives a write, and which statements a caller
-    is allowed to see.
+    Request the URI and receive the description you may read, usually as
+    JSON-LD. Reads can merge statements from readable Contexts. Anonymous
+    callers receive public data; authenticated callers may receive more.
   </p>
-
   <p>
-    sempods exposes resources at their own pod URLs. A client can dereference a
-    URI and receive JSON-LD. With the right grant, it can replace, patch or
-    delete the resource's outgoing statements in a specific context.
+    A client can narrow the read to selected Contexts. Graph-aware
+    representations can preserve Context grouping when provenance matters.
   </p>
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="A pod resource is addressed by URI and written into a selected context">{`resource URI
-    |
-    +--> GET as JSON-LD
-    |
-    +--> write with ?context=
-          PUT / PATCH / DELETE
-          one target named graph`}</pre>
-
-  <h2>Why this matters</h2>
-
+  <h2>Write into an explicit Context</h2>
   <p>
-    If resources are only accessible through one SDK, the SDK becomes the real
-    platform. HTTP keeps the lower layer inspectable. A browser, app, crawler,
-    script or agent can speak to the same resource shape.
+    In the current contract, each write selects one Context. The resource
+    IRI says which thing is described; the Context identifies the statements
+    the caller is authorized to change. A replacement affects that resource's
+    outgoing statements within the selected Context.
   </p>
-
   <p>
-    The SDK is still valuable. It should make the normal path easier, especially
-    for app builders. It should not be the only way to understand or move the
-    data.
+    Conditional operations help a client avoid overwriting a change it has
+    not read. The contract also exposes property slots and edges with their
+    own operation rules.
   </p>
-
-  <h2>Reads can merge contexts</h2>
-
+  <h2>Control-plane authority has its own routes</h2>
   <p>
-    Reads can return the union of contexts the caller may see. Anonymous callers
-    get public Linked Open Data. Authenticated callers get the contexts their
-    token and grants allow, optionally downscoped by request.
+    Grants and registrations are protected control-plane state. Writing RDF
+    about an identity or permission does not grant authority. Their management
+    goes through explicit APIs under <code>/_system</code>.
   </p>
-
   <p>
-    For provenance-sensitive clients, graph-aware representations can keep
-    statements grouped by context. For ordinary app views, the merged JSON-LD
-    resource is the ergonomic default.
+    The specification and implementation also protect reserved namespaces.
+    Check the contract and known deviations before treating a control-plane
+    IRI as an ordinary write target.
   </p>
-
-  <h2>Writes are explicit</h2>
-
+  <h2>A client library makes the path easier</h2>
   <p>
-    Writes target exactly one context. That rule is less convenient than
-    implicit magic, but it keeps authorship and authorization clear. The resource
-    URI and the target context are separate dimensions: the resource says what
-    the thing is, the context says where this statement lives.
+    Kotlin 0.2 separates the HTTP client from optional RDF4J and media adapters.
+    The HTTP core handles JSON-LD text and bytes, with endpoint groups for
+    resources, subjects, slots, Contexts, SPARQL and metadata.
   </p>
-
-  <div class="proof">
-    <h3>The web layer stays honest</h3>
-    <p>
-      The reserved <code>/_system</code> area is not part of ordinary resource
-      CRUD. Control-plane state such as contexts, grants and MCP lives behind
-      dedicated routes.
-    </p>
-    <p class="evidence">
-      Writing triples about a control-plane URI is data. It does not become
-      authorization.
-    </p>
-  </div>
-
-  <h2>Not the marketing headline</h2>
-
   <p>
-    Linked Data CRUD is probably not the first thing to tell a nontechnical
-    visitor. It is still one of the reasons sempods can stay open. The data
-    layer remains web-shaped even when SDKs, apps and agents become more
-    comfortable.
+    The wire contract stays inspectable. You can choose another library or
+    write a client in another language.
   </p>
-
-  <h2>Where the contract is written</h2>
-
-  <p>
-    This page argues for the shape. The form written to bind is the{' '}
-    <a href="https://spec.sempods.org/spec/core/lod-crud/">CRUD chapter</a> of the
-    specification: two layers over one store, the LOD layer that addresses a
-    resource at its canonical IRI, and the system layer that addresses a single
-    property slot and is explicit about where RDF set semantics make it deviate
-    from ordinary HTTP.
-  </p>
-
   <p class="action-links">
-    <a href="/concepts">Back to concepts</a>
-    <a href="/start">Try a live query</a>
-    <a href="https://spec.sempods.org/spec/core/lod-crud/">Read the CRUD chapter</a>
+    <a href={specificationDoc('spec/core/lod-crud.md')}>CRUD contract</a>{' '}
+    <a href={implementationDoc('sempods-client/README.md')}>JVM client guide</a>{' '}
+    <a href="/start#build">Read a resource with the client</a>
   </p>
 </Base>

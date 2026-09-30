@@ -202,7 +202,7 @@ pre code { background: none; padding: 0; margin-left: 0; font-size: 1em; }
 }
 .wordmark {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.45rem;
   font-weight: 600;
   font-size: 1.05rem;
@@ -210,6 +210,7 @@ pre code { background: none; padding: 0; margin-left: 0; font-size: 1em; }
   text-decoration: none;
 }
 .wordmark-mark {
+  align-self: center;
   width: 1.2rem;
   height: 1.2rem;
   flex: 0 0 auto;
@@ -354,6 +355,7 @@ main { padding-top: 3.5rem; }
   background: var(--paper-raised);
 }
 .media-breakout figcaption {
+  text-align: center;
   max-width: var(--measure);
   margin: 0.75rem auto 0;
   color: var(--ink-soft);

@@ -1,237 +1,111 @@
 ---
 import Base from '../layouts/Base.astro';
-
-const curl = `curl -X POST https://sempods.org/aaltra/_system/sparql/query \\
-  -H "Content-Type: application/sparql-query" \\
-  -H "Accept: application/sparql-results+json" \\
-  --data 'PREFIX schema: <https://schema.org/>
-SELECT ?e ?name ?start WHERE {
-  ?e a schema:Event ; schema:name ?name ; schema:startDate ?start
-} ORDER BY ?start LIMIT 3'`;
+import { publicCurl } from '../data/public-query';
+import { SEMPODS_VERSION, SEMPODS_RELEASE_URL } from '../data/coordinates';
 ---
 
 <Base
   title="sempods — your data belongs to you"
-  description="sempods is an open specification for decentralized semantic data pods: data spaces where apps, websites and AI agents work with structured linked data under the owner's control."
+  description="Keep linked data in a pod you control. sempods defines an open contract for apps and agents to use it, with Kotlin building blocks for your own implementation."
   schemaType="WebSite"
 >
-  <p class="eyebrow">open specification · reference implementation · live pods</p>
+  <p class="eyebrow">open contract · independent implementations · live pods</p>
   <h1>Your data belongs to you</h1>
 
   <p class="lede">
-    Every app wants to become the place where your data lives. Your calendar is
-    in one silo, your tasks in another, your notes somewhere else, and your AI
-    memory inside whichever assistant you used last.
+    Your calendar lives in one app, your notes in another, your AI memory in
+    whichever assistant you used last. Changing tools should not mean leaving
+    your knowledge behind.
   </p>
-
   <p>
-    sempods takes the opposite route: put the data in a pod you control, describe
-    it as structured linked data, and let apps, websites and agents come to it
-    with permission. The pod is not just storage. It is where ownership, meaning
-    and access control meet.
+    Put that knowledge in a pod you control. Give it meaning through linked data.
+    Let apps and agents come to it with permission. They can change; your data
+    keeps its own home.
   </p>
 
   <section id="try" class="try-block" aria-labelledby="try-title">
     <p class="eyebrow">try it yourself</p>
     <h2 id="try-title">Query a real pod</h2>
-
     <p>
-      A venue in Chemnitz publishes its events from its own pod. The public
-      context is readable without an account, an API key or an SDK.
+      A venue in Chemnitz publishes its events from its own pod. Read three
+      events with ordinary SPARQL, without an account, API key or SDK:
     </p>
-
-    <pre><code>{curl}</code></pre>
-
+    <pre><code>{publicCurl}</code></pre>
     <p class="evidence">
-      What comes back is not a mock response. These are real events, served as
-      Linked Open Data from a pod the venue controls.
+      The result contains event addresses, names and dates. Follow an event
+      address to read its JSON-LD description.
     </p>
   </section>
 
-  <p>
-    The familiar pieces are deliberate. sempods is not trying to win by inventing
-    a new database, query language, auth system or agent protocol. Its claim is
-    that HTTP resources, RDF, JSON-LD, SPARQL, OAuth/OIDC and MCP become much
-    more useful when they are fitted into one small pod contract.
-  </p>
-
-  <h2 class="after-band">One response, three claims</h2>
-
+  <h2>One example, three useful properties</h2>
   <div class="proof">
-    <h3>Structured</h3>
+    <h3>Shared meaning</h3>
     <p>
-      The response says <code>schema:Event</code> and <code>schema:startDate</code>.
-      Those are shared vocabulary terms, not sempods fields.
-    </p>
-    <p class="evidence">
-      An app that has never heard of this venue can still understand that it is
-      looking at events and dates.
+      The query uses schema.org's Event and startDate terms. The event's
+      JSON-LD description uses them too. Another app can recognize an event
+      without learning a private data format.
     </p>
   </div>
-
   <div class="proof">
-    <h3>Linked</h3>
+    <h3>Links you can follow</h3>
     <p>
-      Every event has its own URI. Follow it and you get the resource itself,
-      with the statements that are public to you.
-    </p>
-    <p class="evidence">
-      That is the difference between a web of data and an API result shaped for
-      one client.
+      An event's URI is its address. Follow it to get the resource, then follow
+      its links. Knowledge stays connected beyond the app that created it.
     </p>
   </div>
-
   <div class="proof">
-    <h3>Decentralized</h3>
+    <h3>A home outside the client</h3>
     <p>
-      Point the same query at another pod and the model stays the same. No
-      central calendar platform has to know first.
-    </p>
-    <p class="evidence">
-      The venue can use software without giving that software permanent ownership
-      of the event graph.
+      A venue website, calendar app and agent can read from the same pod.
+      Each can build its own view while the venue keeps the source data.
     </p>
   </div>
 
   <hr class="divider" />
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="Apps, websites and agents connect to one pod controlled by the data owner">{`clients can change
-
-+---------+   +----------+   +---------+
-| apps    |   | websites |   | agents  |
-+---------+   +----------+   +---------+
-      \\          |          /
-       \\         |         /
-        v        v        v
-
-        +----------------------+
-        | your pod             |
-        | data + meaning       |
-        | grants + provenance  |
-        +----------------------+
-
-the data stays where ownership lives`}</pre>
-
+  <h2>A common way into independent data spaces</h2>
   <p>
-    The result is not another backend-as-a-service. It is a data layer for the
-    open web: addressable by HTTP, readable as JSON-LD, queryable with SPARQL,
-    and built so different implementations can speak the same contract.
+    sempods brings HTTP, RDF, JSON-LD, SPARQL and authorization into one open
+    pod contract. It defines what clients can rely on while leaving room for
+    different stores, software stacks and deployments.
+  </p>
+  <p>
+    Permissions belong with the data. A public visitor can read the event
+    title and date; a trusted app may also reach private planning notes.
+    The pod enforces that boundary across resource reads, queries and agent
+    tools. <a href="/how-it-works">See how the pieces fit</a>.
   </p>
 
+  <h2>AI can use your memory without owning it</h2>
   <p>
-    That is a feature, not a compromise. A pod implementer should be able to
-    reach for RDF stores, HTTP frameworks, OAuth libraries and existing SPARQL
-    tooling, then spend the hard work on the contract: contexts as the permission
-    boundary, server-enforced sandboxing, stable resource IRIs and, when the MCP
-    module is present, an agent surface that does not bypass the rest.
+    An agent is another client of your pod. It can find relevant resources,
+    follow links and work with the knowledge you allow it to see. Its access
+    can end while the knowledge stays in your space.
+  </p>
+  <p>
+    That is useful beyond personal memory. Teams, communities and publishers
+    can build on the same idea: useful knowledge with its own address,
+    meaning and permission boundary. <a href="/use-cases">Explore the cases</a>.
   </p>
 
+  <h2>Choose where you want to begin</h2>
   <p>
-    The direction is close to the old promise of the web: decentralized,
-    federated, linkable knowledge that no single product has to own. sempods is
-    inspired by the same values as Solid, but takes its own route: semantic pods
-    as a coherent stack rather than a private platform API.
+    The specification defines the contract independently of any implementation.
+    sempods-kotlin supplies client libraries, reusable services and a reference
+    composition. Its current release is <a href={SEMPODS_RELEASE_URL}>{SEMPODS_VERSION}</a>.
   </p>
-
+  <p>
+    Build an app against a pod, implement the contract in your own stack, or
+    compose a server from the Kotlin modules. The local composition is for
+    development and evaluation; supported upgrades belong to a concrete deployment.
+  </p>
+  <p>
+    The project is still young, and feedback is welcome. The specification is still in
+    development, and a conformance suite remains unfinished.{' '}<a href="/roadmap">See what is available and what comes next</a>.
+  </p>
   <p class="action-links">
-    <a href="#try">Query a live pod</a>
-    <a href="/how-it-works">See how it works</a>
-    <a href="https://spec.sempods.org">Read the specification</a>
-    <a href="https://github.com/sempods/sempods-kotlin">Read sempods-kotlin</a>
-  </p>
-
-  <h2>AI should not own your memory</h2>
-
-  <p>
-    Ask an AI assistant what is happening in your life. It can reason
-    impressively about public knowledge, but it does not know your plans, your
-    community, your projects or your private history unless those things are
-    copied into yet another product.
-  </p>
-
-  <p>
-    That is the wrong direction. An agent should not need to become the owner of
-    your memory. It should be a client of your memory: reading the contexts you
-    grant, writing to the contexts you allow, and losing access when you revoke
-    the token.
-  </p>
-
-  <p>
-    In sempods, AI is not a privileged path through the system. It is a client
-    like a web app or mobile app. What makes agents interesting is that they are
-    powerful enough to navigate a personal or organizational knowledge graph
-    instead of waiting for every integration to be built by hand.
-  </p>
-
-  <p>
-    For people, that points toward personal pods and real data sovereignty. For
-    companies, the same model is already becoming interesting for knowledge
-    management: structured knowledge, clear permissions, links between sources
-    and AI access that can find the right answer without flattening everything
-    into one new silo.
-  </p>
-
-  <hr class="divider" />
-
-  <h2>A specification, not a private platform API</h2>
-
-  <p>
-    sempods is being written as an open specification. The goal is not that
-    everyone uses one hosted service. The goal is that many pod servers, apps and
-    agents can work with the same model.
-  </p>
-
-  <p>
-    The <a href="https://spec.sempods.org">specification</a> is written and
-    published: core chapters for contexts, grants, authorization, CRUD, SPARQL and{' '}
-    <code>find</code>, optional modules beside them, and an OpenAPI description of
-    the HTTP surface. Every normative statement carries an identifier, so it can
-    be cited rather than paraphrased.
-  </p>
-
-  <p>
-    It is deliberately <em>descriptive</em> until <code>0.1</code> is tagged:
-    where the text and the implementation disagree today, the implementation is
-    right. <a href="https://github.com/sempods/sempods-kotlin">sempods-kotlin</a>{' '}is
-    that implementation — the working server and client stack the specification
-    was extracted from, and the thing it will bind first.
-  </p>
-
-  <div class="status-list">
-    <section>
-      <h3>Running today</h3>
-      <ul>
-        <li>public pods serving real event data as JSON-LD</li>
-        <li>the <a href="https://spec.sempods.org">specification</a> and its OpenAPI descriptions</li>
-        <li>Kotlin reference implementation and JVM artifacts on Maven Central</li>
-        <li>server-enforced SPARQL sandbox over context permissions</li>
-        <li>pod MCP endpoint at <code>/_system/mcp</code></li>
-        <li><a href="https://apps.sempods.org">preview apps</a> built against the SDK</li>
-        <li>hosted test pods by request via <a href="mailto:danilo@sempods.org">email</a></li>
-      </ul>
-    </section>
-    <section>
-      <h3>Next public surfaces</h3>
-      <ul>
-        <li>TypeScript SDK and simpler app examples</li>
-        <li>better <code>find</code> adapters for search and optional vector retrieval</li>
-        <li>semantic contracts such as SHACL and a TBox model under exploration</li>
-      </ul>
-    </section>
-  </div>
-
-  <p>
-    Some early product conversations are already happening around this knowledge
-    management layer. They are not public announcements, and they should not be
-    treated as customer claims. They are a useful signal: the personal vision
-    becomes more plausible when independent teams adopt the open model for their
-    own reasons.
-  </p>
-
-  <p class="action-links">
-    <a href="/start">Start with sempods</a>
-    <a href="/concepts">Read concepts</a>
-    <a href="/use-cases">Explore use cases</a>
-    <a href="https://github.com/sempods/sempods-kotlin/discussions">Discuss on GitHub</a>
+    <a href="/start#build">Build an app</a>{' '}
+    <a href="/start#implement">Implement the contract</a>{' '}
+    <a href="/start#run">Run a pod</a>{' '}
+    <a href="https://github.com/sempods/sempods-kotlin/discussions">Discuss the model</a>
   </p>
 </Base>

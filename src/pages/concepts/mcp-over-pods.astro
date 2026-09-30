@@ -1,103 +1,68 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { implementationDoc, specificationDoc } from '../../data/coordinates';
 ---
 
 <Base
-  title="MCP over sempods — agents as clients of decentralized pods"
-  description="How sempods exposes pod data through MCP without giving AI a privileged backdoor, and why multi-pod MCP matters for decentralized graph retrieval."
+  title="MCP over sempods — agents reach independent data spaces"
+  description="Per-pod MCP and hosted multi-pod MCP give agents access to linked knowledge under each pod's authorization decisions."
   schemaType="TechArticle"
 >
   <p class="eyebrow">concepts · MCP</p>
-  <h1>MCP should make pods reachable, not centralize memory</h1>
-
+  <h1>Let agents come to the knowledge</h1>
   <p class="lede">
-    MCP is interesting for sempods because agents need a simple way to ask for
-    data. It is also dangerous if it becomes a second, more privileged path
-    around the system.
+    MCP gives an agent tools for finding and reading pod data. The useful
+    part is where the knowledge stays: in independent pods whose owners
+    decide what the connection may reach.
   </p>
-
+  <h2>One pod, one optional surface</h2>
   <p>
-    The reference implementation takes the conservative route: the pod MCP
-    endpoint sits at <code>/_system/mcp</code> and exposes tools over the same
-    pod model. The agent is a client. It receives what its token and grants
-    allow.
+    A pod implementing the MCP module exposes <code>/_system/mcp</code>.
+    Its tools can list Contexts, call <code>find</code>, fetch a resource,
+    inspect properties and run sandboxed SPARQL. An agent combines those
+    operations into a retrieval loop.
   </p>
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="MCP tools use the same pod authorization model as HTTP and SPARQL">{`web app        agent via MCP        website
-   |                |                  |
-   v                v                  v
-HTTP/CRUD        MCP tools          SPARQL
-   \\               |                 /
-    \\              |                /
-     v             v               v
-       same pod authorization`}</pre>
-
-  <h2>The useful tools are boring on purpose</h2>
-
   <p>
-    The useful MCP surface is not magic. It exposes primitives an agent can
-    combine: list contexts, <code>find</code> a foothold, fetch a resource, read
-    property values, or run sandboxed SPARQL.
+    The tools add no authority. Authentication and server-resolved grants
+    determine their reach, just as they do for HTTP resource operations.
   </p>
-
+  <h2>Several pods, one agent connection</h2>
   <p>
-    That is enough to support graph retrieval. The agent does not need a custom
-    "answer my whole product question" endpoint. It needs safe access to the
-    graph and enough structure to inspect what it found.
+    The Kotlin hosted MCP service maintains connections to multiple pods.
+    An agent can gather results from independent data spaces, with each pod
+    enforcing its own permissions.
   </p>
-
-  <h2>Multi-pod MCP</h2>
-
   <p>
-    Multi-pod MCP is where the model becomes more than an assistant integration.
-    A single client can connect to several pods, call <code>find</code> across
-    them, and merge the results into a working graph.
+    The hosted service mediates those requests and handles connection
+    credentials. Choose its operator as part of your trust decision. The
+    source data remains in the pods; the agent can combine the returned
+    facts for its task.
   </p>
-
-  <p>
-    Each pod still decides its own visibility. One pod can fail, require
-    reconnect, or return only public data without poisoning the whole result.
-    That is a better shape for federation than copying all memories into one
-    assistant-owned store.
-  </p>
-
   <div class="proof">
-    <h3>Agent memory without agent ownership</h3>
+    <h3>An answer can cross a boundary</h3>
     <p>
-      A hosted MCP service can make several pod connections convenient, but the
-      architectural goal is still the same: the source of truth remains in pods,
-      not in the agent host.
-    </p>
-    <p class="evidence">
-      The revolution is quieter when it is phrased as a rule: agents come to the
-      data.
+      An agent could read public events from a venue and private plans from
+      your pod. The venue decides what is public. You decide what the agent
+      may read from your plans. Combining an answer transfers no authority
+      from one pod to the other.
     </p>
   </div>
-
-  <h2>What is still early</h2>
-
+  <h2>Check the implementation you connect to</h2>
   <p>
-    The rough edges are in tool ergonomics, hosted connection UX, richer
-    retrieval adapters and future write constraints. The baseline is already
-    useful because it keeps the MCP surface close to the same HTTP, SPARQL and
-    permission model the pod already uses.
+    MCP is optional in the specification. Kotlin 0.2 supplies both per-pod and
+    hosted surfaces, with setup described in their guides. A running host's
+    configuration and revision need their own verification.
   </p>
-
-  <h2>Where the contract is written</h2>
-
   <p>
-    MCP is an optional <a href="https://spec.sempods.org/spec/modules/mcp/">module</a>{' '}
-    of the specification, and a pod provides it only if it says so at its
-    conformance endpoint. The requirement that carries this page is that the
-    endpoint is a projection of surfaces the core chapters already define: it adds
-    no authority and no data path of its own. "Not a privileged backdoor" is the
-    readable form of that sentence.
+    The contract requires conformance discovery. Kotlin 0.2 does not yet
+    serve <code>/_system/conformance</code>; its release notes record the
+    deviation. Use its documented capabilities rather than assuming that
+    discovery is available.
   </p>
-
   <p class="action-links">
-    <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/linked-data-crud">Next: Linked Data CRUD</a>
-    <a href="https://spec.sempods.org/spec/modules/mcp/">Read the MCP module</a>
-    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/mcp/tools.md">Implementation notes</a>
+    <a href={specificationDoc('spec/modules/mcp.md')}>MCP module</a>{' '}
+    <a href={implementationDoc('docs/mcp/README.md')}>Per-pod MCP guide</a>{' '}
+    <a href={implementationDoc('sempods-mcp/docs/README.md')}>Hosted MCP guide</a>{' '}
+    <a href="/concepts/graph-retrieval">Follow the retrieval loop</a>
   </p>
 </Base>

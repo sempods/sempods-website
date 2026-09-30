@@ -1,0 +1,17 @@
+{
+  "implementation": {
+    "version": "0.2.0",
+    "tag": "v0.2.0",
+    "commit": "f4a0941bbc6ea8951c6fbade6d1fa437d3decaf4"
+  },
+  "specification": {
+    "commit": "10d91f307ad91c9bdca16e037b4088c27be49dbf",
+    "versions": {
+      "core": "0.1-dev",
+      "context-management": "0.1-dev",
+      "oidc": "0.1-dev",
+      "media": "0.1-dev",
+      "mcp": "0.1-dev"
+    }
+  }
+}

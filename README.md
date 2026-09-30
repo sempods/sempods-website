@@ -11,6 +11,22 @@ npm run dev      # http://localhost:4321
 npm run build    # astro build, then pagefind over dist/
 ```
 
+For a release assessment or website update, follow the
+[release procedure](docs/agents/release-website.md). `npm run audit:release -- --help`
+shows the local inventory command. The inventory collects review evidence; it does not
+validate examples or public services. After a fresh build,
+`npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempods-spec`
+checks rendered local/source links, stylesheets, scripts, media and social-preview assets,
+and inline word boundaries. It requires Python 3.
+`npm run demo:verify` checks the anonymous public query and a returned event with network access,
+expanding JSON-LD before checking RDF terms, literal names and date values.
+`npm run test:release` runs offline regression tests for the inventory, manifest validation,
+rendered links/assets and public-demo results.
+
+The [0.2.0 assessment](docs/reviews/0.2.0.md) records the first review and its evidence.
+The Codex [release skill](skills/sempods-website-release/SKILL.md) is versioned here;
+the personal installation in `~/.codex/skills/sempods-website-release` is a copy.
+
 ## Why Pages and explicit pod URLs
 
 Netlify manages an apex domain and its `www` as a pair: it cannot serve
@@ -36,11 +52,17 @@ than being typed here.
 
 ## State
 
-Every page carries real copy; none of them are skeletons. What the site still owes
-is a compiled source for code examples — every snippet should come from something
-that builds, and none does yet. The reasoning behind the structure is recorded in
-`docs/website.md` in the planning repo, and what is still open is workstream B of
-`docs/roadmaps/go-live.md` beside it.
+The website is reviewed against Kotlin 0.2.0 and an independently pinned specification
+revision in `src/data/release.json`. The [update report](docs/reviews/0.2.0-update.md)
+records the editorial decisions and verification.
+
+Client snippets are extracted from the tagged implementation's documentation tests.
+The [example pipeline](docs/agents/example-pipeline.md) checks that extraction and runs
+the displayed dependencies and snippets against Maven Central on Java 21. The public
+SPARQL query has one source shared by the home and start pages.
+
+The structure's original reasoning remains in `docs/website.md` in the private planning
+repo. Reassess its outstanding work against the current release procedure and report.
 
 ## Licensing
 

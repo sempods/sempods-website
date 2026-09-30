@@ -1,156 +1,75 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { implementationDoc, specificationDoc } from '../../data/coordinates';
 ---
 
 <Base
-  title="Graph retrieval in sempods"
-  description="Graph retrieval in sempods starts with find, then follows RDF links through context-sandboxed pod data. It is useful for apps and AI agents without turning data into opaque chunks."
+  title="Graph retrieval in sempods — find a foothold, follow the links"
+  description="Use find to locate resources, follow their RDF links, and build a useful graph within the caller's authorized data."
   schemaType="TechArticle"
 >
-  <p class="eyebrow">concepts · graph retrieval</p>
-  <h1>Graph retrieval starts with a foothold, not a dump</h1>
-
+  <p class="eyebrow">concepts · retrieval</p>
+  <h1>A foothold is more useful than a dump</h1>
   <p class="lede">
-    Retrieval usually means turning documents into chunks, embedding them, and
-    hoping the nearest text fragment contains the answer. sempods starts from a
-    different unit: a resource in a graph.
+    An event has a name, dates, a place and links. A task has people and
+    projects around it. Retrieval can begin with one useful resource and
+    follow those relationships until the client has what its task needs.
   </p>
-
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="Find a starting resource, follow links, then build a view or answer">{`question or view
+      |
+      v
+     find
+      |
+      v
+ working graph ----> view or answer
+      |
+      +--> follow links
+           resource reads / SPARQL`}</pre>
+  <h2>Find is the entry point</h2>
   <p>
-    An event is not only a paragraph about an event. It has a URI, a type, a
-    name, a start date, an image, a location and links to other resources. A
-    task, note, person or project can work the same way. Retrieval can therefore
-    move from one known thing to related things instead of searching every fact
-    from scratch.
+    A client gives <code>find</code> text and optional constraints such as
+    resource type. It receives an RDF subgraph with matching resources and
+    useful surrounding statements. The result gives it things to inspect
+    and addresses to follow.
   </p>
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="Find returns a foothold, traversal follows links, answer or view is built from the working graph">{`question or view need
-        |
-        v
-      find
-  semantic entry
-        |
-        v
-  working graph
-   |          |
-   |          +--> answer or render
-   |
-   +--> follow URIs
-        get_resource / SPARQL
-        merge facts back into the graph`}</pre>
-
-  <h2>The role of find</h2>
-
   <p>
-    <code>find</code> is the entry abstraction. A client gives the pod text and
-    may constrain the returned resource type. The result is not a proprietary
-    search result object. It is an RDF subgraph: matching resources plus a small
-    expansion such as type, label and name.
+    The contract describes the result rather than a search algorithm. Kotlin
+    0.2 supplies a SPARQL regex adapter over literals. A deployment can add
+    other adapters behind the same interface; vector retrieval is not a
+    feature shipped by that adapter.
   </p>
-
-  <p>
-    The important design choice is that <code>find</code> is a contract, not an
-    algorithm. In the reference implementation today, the live adapter is a
-    SPARQL regex text match over literals. In another implementation, the same
-    shape has already been useful with lexical search and vector search adapters
-    running beside it. The caller still says <code>find</code>; the pod decides
-    which engines can satisfy that request.
-  </p>
-
-  <div class="proof">
-    <h3>Small surface, swappable engine</h3>
-    <p>
-      The reference stack has a <code>FindService</code> that fans out to
-      registered <code>FindAdapter</code> implementations and merges the
-      returned graph. Today that includes <code>SparqlTextFindAdapter</code>.
-      Search and optional vector retrieval can arrive behind the same boundary.
-    </p>
-    <p class="evidence">
-      This is why <code>find</code> is a useful public word: it names the
-      semantic entry point without freezing the search engine.
-    </p>
-  </div>
-
   <h2>Traversal does the deeper work</h2>
-
   <p>
-    Once <code>find</code> gives a foothold, the client can inspect the graph.
-    It can fetch a known resource, follow a URI, or run a SPARQL graph query for
-    the exact neighbourhood the view or question needs.
+    Fetch a known resource, follow its links, or query the neighbourhood
+    you need. Add those facts to the working graph. A calendar can render it;
+    an agent can use it to answer a question.
   </p>
-
   <p>
-    That loop matters for AI, but it is not AI-only. A calendar widget can use
-    the same pattern to find events and fetch venue data. An agent can use it to
-    gather enough grounded facts before it answers. The last step differs:
-    applications render the graph, agents turn the graph into text.
+    This loop is client behavior built on the data operations. The client
+    chooses when it has enough information, while each pod decides which
+    facts it may return.
   </p>
-
-  <h2>Permissions are part of retrieval</h2>
-
+  <h2>Permissions apply throughout</h2>
   <p>
-    Graph retrieval only works if it cannot quietly step around authorization.
-    sempods keeps retrieval inside the same context sandbox as SPARQL and
-    resource reads. An anonymous visitor can find public events. A private agent
-    can find more only when its token grants the relevant contexts.
+    The current contract limits retrieval and traversal to readable Contexts.
+    An anonymous visitor can find public events. A caller with private grants
+    can reach more. Search cannot bypass the authorization decision made for
+    the same data through a resource read or SPARQL.
   </p>
-
+  <h2>Useful for memory, useful for ordinary apps</h2>
   <p>
-    Contexts are the current boundary in the reference implementation. The
-    broader authorization work may become more expressive, especially around
-    ACP-style policies and fine-grained AuthZ, but the principle should survive:
-    search depth is a function of permission, not of which client surface was
-    used.
+    Notes, tasks and observations could become linked knowledge in a personal
+    pod. An agent could gather the relevant slice for one question without
+    making its own product the permanent home of that memory.
   </p>
-
-  <h2>Why this matters for memory</h2>
-
   <p>
-    A local memory browser pod is the natural place where this becomes personal:
-    notes, tasks, calendar entries, projects and observations can become a
-    graph the user controls. That surface is not public yet, but it explains why
-    graph retrieval is central to sempods.
+    The same pattern helps a venue website fetch a location for an event.
+    Shared meaning and stable addresses make the links useful to both clients.
   </p>
-
-  <p>
-    The agent should not own the memory. It should arrive with a grant, use{' '}
-    <code>find</code> to locate a useful foothold, traverse what it is allowed
-    to read, and leave the knowledge where it belongs.
-  </p>
-
-  <h2>Where MCP fits</h2>
-
-  <p>
-    MCP makes the same idea available to agents. The pod MCP endpoint exposes{' '}
-    <code>find</code>, resource reads and SPARQL-style traversal as tools, but
-    it does not turn AI into a privileged path. A multi-MCP setup is interesting
-    for the opposite reason: an agent can work across several independent pods,
-    each with its own grants.
-  </p>
-
-  <p>
-    The near-term direction is simple: keep <code>find</code> small, add better
-    adapters behind it, and let clients traverse real linked data instead of
-    flattening knowledge into one more private index.
-  </p>
-
-  <h2>Where the contract is written</h2>
-
-  <p>
-    "A contract, not an algorithm" is not a phrase this page invented for the
-    occasion. It is the first requirement of the{' '}
-    <a href="https://spec.sempods.org/spec/core/find/">find chapter</a>, written
-    to leave an implementation free to satisfy <code>find</code> with any engine
-    it likes and to stop it making the caller choose one. The chapter covers the
-    built half;
-    the traversal loop above is what clients do with it, and that is design work
-    rather than specified behaviour.
-  </p>
-
   <p class="action-links">
-    <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/federated-grants">Next: federated grants</a>
-    <a href="https://spec.sempods.org/spec/core/find/">Read the find chapter</a>
-    <a href="https://github.com/sempods/sempods-kotlin/blob/main/docs/concepts/graph-retrieval.md">Implementation notes</a>
+    <a href={specificationDoc('spec/core/find.md')}>Find contract</a>{' '}
+    <a href={implementationDoc('docs/concepts/graph-retrieval.md')}>Implementation and adapters</a>{' '}
+    <a href="/concepts/mcp-over-pods">Use the loop through MCP</a>{' '}
+    <a href="/start#build">Build a client</a>
   </p>
 </Base>

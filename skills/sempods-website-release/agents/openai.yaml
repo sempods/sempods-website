@@ -1,0 +1,4 @@
+interface:
+  display_name: "sempods website release"
+  short_description: "Review and update the website for a sempods release"
+  default_prompt: "Use $sempods-website-release to assess or update the sempods website for the requested release."

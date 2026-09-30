@@ -1,107 +1,68 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { specificationDoc } from '../../data/coordinates';
 ---
 
 <Base
-  title="Context permissions in sempods"
-  description="How sempods uses contexts as the current permission boundary, with read, write and manage grants resolved server-side for apps, agents and public Linked Data."
+  title="Context permissions — public and private depth in one pod"
+  description="Contexts are the current sempods authorization boundary. Grants are resolved server-side, so resources can hold public and private statements at the same URI."
   schemaType="TechArticle"
 >
   <p class="eyebrow">concepts · permissions</p>
-  <h1>Permissions should follow the graph, not the app</h1>
-
+  <h1>Same resource, different depth</h1>
   <p class="lede">
-    In the current reference implementation, a context is the permission
-    boundary. It is a named graph inside a pod: a place where statements live and
-    where read, write and manage authority can be granted.
+    An event has one address. Its date can be public while its booking notes
+    stay private. Contexts let the current sempods contract express that
+    difference without creating a second event.
   </p>
-
-  <p>
-    Contexts are deliberately smaller than products. A calendar app can read a
-    public event context. A private planning app can write to an internal
-    context. An agent can see only the contexts its token grants.
-  </p>
-
-  <pre class="ascii-diagram" role="img" data-no-copy aria-label="One resource can have statements in public and private contexts">{`same resource URI
+  <pre class="ascii-diagram" role="img" data-no-copy aria-label="One event has public facts and private notes in separate Contexts">{`same event URI
       |
-      +--> public context
+      +--> public Context
       |      title, date, location
       |
-      +--> private context
-             notes, drafts, internal status`}</pre>
-
-  <h2>The current grant shape</h2>
-
+      +--> private Context
+             notes, drafts, planning`}</pre>
+  <h2>A Context is a permission boundary</h2>
   <p>
-    The working model attaches grants to context IRIs. The permissions are{' '}
-    <code>read</code>, <code>write</code> and <code>manage</code>. Public reads
-    are handled as a public-read capability over contexts the pod exposes to the
-    open web.
+    A Context is an RDF named graph. Every statement belongs to exactly one.
+    Grants name its IRI with <code>#read</code>, <code>#write</code> or{' '}<code>#manage</code>. An app can receive access to public events and private
+    planning without receiving access to contacts.
   </p>
-
   <p>
-    The important implementation detail is that context permissions are resolved
-    server-side on each request. Access tokens stay slim. If a grant is revoked,
-    the next request sees the reduced context set.
+    The pod resolves grants on each request. They are durable server-side
+    policy, separate from the coarse OAuth scopes carried in a token.
+    Revoking a grant changes what the next request may reach.
   </p>
-
-  <div class="proof">
-    <h3>Downscope, not disclosure</h3>
-    <p>
-      Read surfaces can accept a context downscope. Unknown or unreadable
-      contexts are silently excluded, so a caller cannot use errors to map
-      private context topology.
-    </p>
-    <p class="evidence">
-      The server returns the readable slice, not a diagnostic tour of what the
-      caller failed to access.
-    </p>
-  </div>
-
-  <h2>Why contexts are useful</h2>
-
+  <h2>One decision across the data surfaces</h2>
   <p>
-    Contexts let the same resource carry different depth for different callers.
-    A venue can publish an event publicly and keep booking notes private. A
-    company can expose product knowledge to support tools while holding internal
-    planning facts back.
+    Resource reads, <code>find</code>, SPARQL and optional MCP tools use the
+    caller's readable Contexts. A query cannot gain access by naming a private
+    graph. A write needs authority over its explicit target Context.
   </p>
-
   <p>
-    This is also what makes graph retrieval safer. <code>find</code>, resource
-    reads, SPARQL and MCP tools can all work over the same effective readable
-    contexts instead of each surface inventing its own permissions.
+    Clients can narrow a read to selected Contexts. Unknown or unreadable
+    selections add no data; the result does not disclose the private catalogue.
   </p>
-
-  <h2>Where ACP may fit</h2>
-
+  <h2>Lifecycle is optional; the current boundary is core</h2>
   <p>
-    The authorization model is being reconsidered toward ACP-style and more
-    fine-grained AuthZ. That should not be hidden. The website should not claim
-    that context grants are the final word.
+    Every current core implementation supports the Context contract. Creating
+    and deleting Contexts through HTTP is a separate optional module. A
+    deployment can provision its Contexts another way.
   </p>
-
+  <h2>The direction is broader</h2>
   <p>
-    The stable idea is weaker and more important: permissions must be enforced
-    by the pod, must survive different client surfaces, and must let data stay
-    in the owner's space while apps come and go.
+    The <a href={specificationDoc('docs/vision.md')}>vision</a> leaves room for
+    different storage and policy models. <a href={specificationDoc('docs/proposals/data-access.md')}>Authorized data access</a>{' '}proposes ordinary operations without Context setup, while retaining discovery
+    and selection of named views. That proposal has not replaced the current contract.
   </p>
-
-  <h2>Where the contract is written</h2>
-
   <p>
-    Since this page was first written, the model stopped being a description of
-    one implementation. <a href="https://spec.sempods.org/spec/core/contexts/">Contexts</a>{' '}
-    and <a href="https://spec.sempods.org/spec/core/grants/">grants</a> are two
-    chapters of the specification, and they are where the normative version
-    lives: every statement in exactly one context, a grant as durable per-context
-    policy, delegation as set intersection, and the whole decision made on the
-    server.
+    The aim is a small common interface: the pod protects the data, and clients
+    can use it without adopting its internal policy representation.
   </p>
-
   <p class="action-links">
-    <a href="/concepts">Back to concepts</a>
-    <a href="/concepts/graph-retrieval">Next: graph retrieval</a>
-    <a href="https://spec.sempods.org/spec/core/grants/">Read the grants chapter</a>
+    <a href={specificationDoc('spec/core/contexts.md')}>Context contract</a>{' '}
+    <a href={specificationDoc('spec/core/grants.md')}>Grant contract</a>{' '}
+    <a href={specificationDoc('spec/modules/context-management.md')}>Optional lifecycle module</a>{' '}
+    <a href="/concepts/graph-retrieval">Explore retrieval</a>
   </p>
 </Base>

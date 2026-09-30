@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import { assertEvent, assertEventRow, assertPublicEventUrl } from './lib/public-demo.mjs';
+import { publicPod, publicQuery } from '../src/data/public-query.ts';
+
+const query = await fetch(`${publicPod}/_system/sparql/query`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/sparql-query', Accept: 'application/sparql-results+json' },
+  body: publicQuery,
+  signal: AbortSignal.timeout(20000),
+  redirect: 'error',
+});
+assert.equal(query.status, 200, 'Public query status');
+assert.match(query.headers.get('content-type') ?? '', /application\/sparql-results\+json/, 'Public query media type');
+const results = await query.json();
+assert.deepEqual(results.head.vars, ['e', 'name', 'start'], 'Projected variables');
+assert.equal(results.results.bindings.length, 3, 'The website demonstrates three events');
+for (const row of results.results.bindings) {
+  assertEventRow(row);
+}
+assert.equal(new Set(results.results.bindings.map(row => row.e.value)).size, 3,
+  'The website demonstrates three distinct events');
+const event = results.results.bindings[0].e.value;
+assertPublicEventUrl(event, publicPod);
+const resource = await fetch(event, {
+  headers: { Accept: 'application/ld+json' },
+  signal: AbortSignal.timeout(20000),
+  redirect: 'error',
+});
+assert.equal(resource.status, 200, 'Event read status');
+assert.match(resource.headers.get('content-type') ?? '', /application\/ld\+json/, 'Event media type');
+const representation = await resource.json();
+await assertEvent(representation, event);
+console.log(JSON.stringify({
+  checkedAt: new Date().toISOString(), queryStatus: query.status,
+  rows: results.results.bindings.length, event, eventStatus: resource.status,
+}, null, 2));
