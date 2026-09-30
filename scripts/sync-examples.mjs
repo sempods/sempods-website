@@ -17,6 +17,12 @@ try {
   const git = (...params) => execFileSync('git', ['-c', 'core.fsmonitor=false', '-C', kotlin, ...params], { encoding: 'utf8' }).trimEnd();
   const commit = git('rev-parse', '--verify', `${release.implementation.tag}^{commit}`);
   if (commit !== release.implementation.commit) throw new Error('Release tag does not match the recorded commit.');
+  const properties = git('show', `${commit}:gradle.properties`);
+  const version = /^version\s*=\s*(\S+)\s*$/m.exec(properties)?.[1];
+  if (!version) throw new Error('No release version found in tagged gradle.properties.');
+  if (version !== release.implementation.version) {
+    throw new Error(`Recorded release version ${release.implementation.version} differs from tagged gradle.properties (${version}).`);
+  }
   const path = 'sempods-client/src/test/kotlin/org/sempods/client/DocumentationExamplesTest.kt';
   const source = git('show', `${commit}:${path}`);
   function region(name) {

@@ -5,7 +5,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 import re
 import subprocess
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--dist', default='dist')
@@ -63,8 +63,13 @@ repositories = {'sempods-kotlin': args.kotlin, 'sempods-spec': args.spec}
 for file, page in pages.items():
     for href in page.links:
         parsed = urlparse(href)
-        if href.startswith('/') and not href.startswith('//') or href.startswith('#'):
-            target = root / unquote(parsed.path).lstrip('/') if parsed.path else file
+        if not parsed.scheme and not parsed.netloc:
+            page_path = '/' + file.relative_to(root).as_posix()
+            if page_path.endswith('/index.html'):
+                page_path = page_path[:-len('index.html')]
+            local = urlparse(urljoin(page_path, href))
+            target = root / unquote(local.path).lstrip('/')
+            parsed = local
             if target.is_dir() or not target.exists() and not target.suffix:
                 target /= 'index.html'
             if not target.exists():

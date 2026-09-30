@@ -118,7 +118,9 @@ A SELECT result does not necessarily contain the RDF predicates used in its quer
 “demonstrates a contract” from “proves interoperability across implementations”. Use public reads;
 do not create data, clients or accounts to validate a public demo. Record time and outcome. `npm run demo:verify` runs the exact shared query, checks the
 three projected event rows, and reads a returned URI to verify an Event with a start date. It
-requires public network access and does not identify the deployed release. A temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
+expands the returned JSON-LD before testing RDF terms, so compacted terms and aliases are
+accepted. It requires public network access and does not identify the deployed release. A
+temporary failure calls for an honest fallback, not an invented response or deletion of the concept.
 
 Release links use immutable revisions. Explicit “latest development” links may follow `main`.
 Container tags and source labels do not prove a digest, a deployment version or an upgrade path.
@@ -167,15 +169,16 @@ An assessment ends with the source record, redesign decision, page matrix, featu
 example/setup gaps, proposed editorial brief and remaining uncertainty. Keep it distinct from a
 maintained roadmap. Public implementation work follows the repositories' issue/PR conventions.
 
-When applying an update, run `npm run check` and `npm run build`, then check generated output:
+When applying an update, run `npm run test:release`, `npm run check` and `npm run build`,
+then check generated output:
 
 ```bash
 npm run check:rendered -- --kotlin /path/to/sempods-kotlin --spec /path/to/sempods-spec
 ```
 
 The Python standard-library helper checks local links, images and anchors, including links
-rendered from JavaScript helpers. It checks GitHub source paths and heading anchors against the
-revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
+rendered from JavaScript helpers. Relative URLs without a scheme resolve against the current
+page URL. It checks GitHub source paths and heading anchors against the revision in each rendered URL, and flags joined words at inline elements. Its Markdown slug
 check covers ordinary headings; inspect custom rendering when it reports uncertainty. It does
 not check remote availability, arbitrary external links or editorial truth. A new build is required
 before each run; existing `dist/` may describe older source.

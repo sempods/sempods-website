@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { assertEvent } from './lib/public-demo.mjs';
 import { publicPod, publicQuery } from '../src/data/public-query.ts';
 
 const query = await fetch(`${publicPod}/_system/sparql/query`, {
@@ -24,13 +25,7 @@ const resource = await fetch(event, {
 assert.equal(resource.status, 200, 'Event read status');
 assert.match(resource.headers.get('content-type') ?? '', /application\/ld\+json/, 'Event media type');
 const representation = await resource.json();
-function nodes(value) {
-  if (!value || typeof value !== 'object') return [];
-  return [value, ...Object.values(value).flatMap(nodes)];
-}
-const eventNodes = nodes(representation).filter(node =>
-  [node['@type']].flat().includes('https://schema.org/Event'));
-assert.ok(eventNodes.some(node => 'https://schema.org/startDate' in node), 'An Event has a startDate in the returned RDF');
+await assertEvent(representation, event);
 console.log(JSON.stringify({
   checkedAt: new Date().toISOString(), queryStatus: query.status,
   rows: results.results.bindings.length, event, eventStatus: resource.status,

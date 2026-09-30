@@ -15,8 +15,9 @@ npm run examples:sync -- --kotlin /path/to/sempods-kotlin --check
 
 The generated `src/data/client-examples.json` records the commit, source path,
 source hash, region names and compiler version. Extraction fails if the tag disagrees
-with the manifest or either region is missing or duplicated. `--check` fails if the
-recorded snippets differ from the release source. The working checkout may be on the
+with the manifest, the manifest version differs from tagged `gradle.properties`, or either
+region is missing or duplicated. `--check` fails if the recorded snippets differ from
+the release source. The working checkout may be on the
 next snapshot; extraction uses the tag.
 
 Run the displayed dependencies and unchanged regions in a separate consumer:

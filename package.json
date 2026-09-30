@@ -11,7 +11,8 @@
     "examples:sync": "node scripts/sync-examples.mjs",
     "examples:verify": "node scripts/verify-published-example.mjs",
     "check:rendered": "python3 scripts/check-rendered-links.py",
-    "demo:verify": "node scripts/verify-public-demo.mjs"
+    "demo:verify": "node scripts/verify-public-demo.mjs",
+    "test:release": "node --test scripts/tests/*.test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "jsonld": "^9.0.0",
     "pagefind": "^1.4.0",
     "typescript": "^6.0.3"
   }
