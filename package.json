@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.3.5"
+    "astro": "^7.4.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.12",
     "jsonld": "^9.0.0",
-    "pagefind": "^1.4.0",
+    "pagefind": "^1.6.0",
     "typescript": "^6.0.3"
   }
 }
