@@ -91,6 +91,11 @@ set goes stale. URLs carry **no language prefix** (`/use-cases/events`, never
 `/en/use-cases/events`) so Astro's `prefixDefaultLocale: false` can add `/de/` later
 without moving an existing URL.
 
+## Pull request reviews
+
+When asked to review a GitHub pull request, post each actionable finding in
+English as an inline review comment on the relevant lines of the current diff.
+
 ## Decisions
 
 Structure and the reasoning behind it: `docs/website.md` in the private planning
